@@ -1,0 +1,34 @@
+.h100 {
+  height: 100%;
+}
+.w100 {
+  width: 100%;
+}
+.vh100 {
+  height: 100vh;
+}
+.wh100 {
+  width: 100vw;
+}
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#root {
+  font-family: "Raleway", sans-serif;
+}
+
+body {
+  height: 100%;
+}
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+}
