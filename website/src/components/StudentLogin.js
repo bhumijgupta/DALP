@@ -10,7 +10,8 @@ export class Student extends Component {
   state = {
     name: "",
     courseId: "",
-    verifyId: null
+    verifyId: null,
+    redirect: false
   };
 
   componentDidUpdate = async () => {
@@ -31,11 +32,12 @@ export class Student extends Component {
       name: this.state.name,
       courseId: this.state.courseId
     });
+    this.setState({ redirect: true });
   };
 
   render() {
     if (this.state.redirect) {
-      return <Redirect to="/student/dashboard" />;
+      return <Redirect to="/student/setup" />;
     }
     return (
       <div className="student">

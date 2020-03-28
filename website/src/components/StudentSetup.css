@@ -1,0 +1,11 @@
+.student-setup .content {
+  margin-top: 36px;
+}
+.student-setup .title {
+  font-weight: 600;
+  font-size: 1.4rem;
+}
+
+#canvas {
+  display: none;
+}

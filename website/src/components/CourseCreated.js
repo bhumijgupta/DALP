@@ -8,16 +8,17 @@ class CourseCreated extends React.Component {
     btnText: "Copy"
   };
 
+  // TODO:Convert mail to html mail with good formatting
   getmailText = () =>
     `mailto:someone@gmail.com?subject=Course%20ID%20for%20course%20${encodeURI(
       this.props.courseName
-    )}%20&body=Please%20find%20course%20ID%20for%20your%20upcoming%20course%20on%20DALP%20in%20this%20mail%20below.Course%20Facilitator%20${encodeURI(
+    )}%20&body=Please%20find%20course%20ID%20for%20your%20upcoming%20course%20on%20DALP%20in%20this%20mail%20below.%0D%0ACourse%20Facilitator%20${encodeURI(
       this.props.name
-    )}%3ACourse%20Name%20${encodeURI(
+    )}%0D%0ACourse%20Name%20${encodeURI(
       this.props.courseName
-    )}%3ACourse%20ID%20${encodeURI(
+    )}%0D%0ACourse%20ID%20${encodeURI(
       this.props.courseId
-    )}%3AGo%20to%20DALP%20and%20enter%20this%20course%20ID%20while%20registering.`;
+    )}%0D%0AGo%20to%20DALP%20and%20enter%20this%20course%20ID%20while%20registering.`;
 
   onClickCopy = e => {
     this.text.select();
