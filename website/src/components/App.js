@@ -15,17 +15,19 @@ import "./App.css";
 
 class App extends Component {
   state = {
-    StudentAuth: true,
-    TeacherAuth: true,
-    TeacherState: {
-      name: "Rajvir Thakur",
-      courseId: "abcd-efgh-ijkl-mnopqrs",
-      courseName: "Introduction to DBMS"
-    },
-    StudentState: {
-      name: "Bhumij Gupta",
-      courseId: "abcd-efgh-ijkl-mnopqrs"
-    }
+    StudentAuth: false,
+    TeacherAuth: false,
+    TeacherState: null,
+    StudentState: null
+    // TeacherState: {
+    //   name: "Rajvir Thakur",
+    //   courseId: "abcd-efgh-ijkl-mnopqrs",
+    //   courseName: "Introduction to DBMS"
+    // },
+    // StudentState: {
+    //   name: "Bhumij Gupta",
+    //   courseId: "abcd-efgh-ijkl-mnopqrs"
+    // }
   };
 
   handleStudentLogin = StudentState => {

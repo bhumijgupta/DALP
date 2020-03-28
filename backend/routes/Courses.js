@@ -3,6 +3,7 @@ const sanitizer = require("sanitizer");
 const router = express.Router();
 const Course = require("../models/Course");
 //Room producing function
+//TODO:make 18
 const getRoom = (name, coursename, uniqueId) => {
   const tillFlag = coursename.length > 4 ? 4 : coursename.length;
 

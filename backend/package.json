@@ -30,6 +30,8 @@
     "helmet": "^3.22.0",
     "mongoose": "^5.9.6",
     "morgan": "^1.10.0",
+    "nocache": "^2.1.0",
+    "peer": "^0.5.1",
     "sanitizer": "^0.1.3"
   }
 }

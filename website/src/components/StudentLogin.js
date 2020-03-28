@@ -15,6 +15,7 @@ export class Student extends Component {
   };
 
   componentDidUpdate = async () => {
+    //TODO:I think verify is enough
     if (this.state.courseId.length === 18 && this.state.verifyId === null) {
       let response = await api.get(`/verify/${this.state.courseId}`);
       console.log("response", response);
