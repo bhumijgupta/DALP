@@ -1,0 +1,12 @@
+.student form {
+  font-weight: 600;
+}
+
+.student form button {
+  width: 100%;
+}
+
+.student .title {
+  font-weight: 600;
+  font-size: 1.4rem;
+}

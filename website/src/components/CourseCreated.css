@@ -1,0 +1,19 @@
+.course-created .card {
+  padding: 20px;
+  color: #3083ed;
+  font-weight: 500;
+}
+
+.course-created .card-title {
+  font-weight: 600;
+  font-size: 1.4rem;
+}
+
+.course-created a {
+  text-decoration: none;
+  color: white !important;
+}
+
+.course-created button {
+  margin-bottom: 10px;
+}

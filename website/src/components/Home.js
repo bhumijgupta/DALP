@@ -2,23 +2,15 @@ import React, { Component } from "react";
 import LoginCard from "./LoginCard";
 import TeachingImage from "../assets/teaching.svg";
 import "./Home.css";
+import GradientContainer from "./GradientContainer";
+import BrandHeader from "./BrandHeader";
 
 export class Home extends Component {
-  state = {};
-
   render() {
     return (
       <div className="home">
-        <div className="container vh100 flex-center vert-flex">
-          <div className="row">
-            <div className="text-center header noselect">
-              <span className="brand">
-                D<span>A</span>L P
-              </span>
-              <br />
-              Distance Academic Learning Portal
-            </div>
-          </div>
+        <GradientContainer>
+          <BrandHeader />
           <div className="row">
             <div className="col-md-12 sm-image text-center">
               <img src={TeachingImage} alt="Teaching vector"></img>
@@ -30,7 +22,7 @@ export class Home extends Component {
               <LoginCard type="Student" />
             </div>
           </div>
-        </div>
+        </GradientContainer>
       </div>
     );
   }

@@ -1,0 +1,12 @@
+.teacher form {
+  font-weight: 600;
+}
+
+.teacher form button {
+  width: 100%;
+}
+
+.teacher .title {
+  font-weight: 600;
+  font-size: 1.4rem;
+}

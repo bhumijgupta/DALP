@@ -1,0 +1,20 @@
+.gradient-container {
+  background: #56ccf2; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    45deg,
+    #2267c2,
+    #56acf2
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    45deg,
+    #2267c2,
+    #56acf2
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+  color: white;
+}
+
+.gradient-container .flex-center.vert-flex {
+  flex-direction: column;
+  justify-content: space-evenly !important;
+}
