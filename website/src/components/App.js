@@ -21,13 +21,34 @@ class App extends Component {
     StudentState: null
     // TeacherState: {
     //   name: "Rajvir Thakur",
-    //   courseId: "abcd-efgh-ijkl-mnopqrs",
-    //   courseName: "Introduction to DBMS"
+    //   courseId: "BhumDJhk31305e7fae",
+    //   courseName: "Introduction to DBMS",
+    //   quiz: [
+    //     {
+    //       title: "Closest plane to sun is",
+    //       option1: "Mercury",
+    //       option2: "Earth",
+    //       answer: 1,
+    //       num: 1
+    //     }
+    //   ],
+    //   quizTitle: "Solar System 1"
     // },
     // StudentState: {
     //   name: "Bhumij Gupta",
-    //   courseId: "abcd-efgh-ijkl-mnopqrs"
+    //   courseId: "BhumDJhk31305e7fae"
     // }
+  };
+
+  handleCreateQuiz = quiz => {
+    console.log(quiz);
+    this.setState({
+      TeacherState: {
+        ...this.state.TeacherState,
+        quiz: quiz.quiz,
+        quizTitle: quiz.title
+      }
+    });
   };
 
   handleStudentLogin = StudentState => {
@@ -76,7 +97,12 @@ class App extends Component {
             <Route
               exact
               path="/teacher/setup"
-              render={() => <TeacherSetup {...this.state} />}
+              render={() => (
+                <TeacherSetup
+                  {...this.state}
+                  handleCreateQuiz={this.handleCreateQuiz}
+                />
+              )}
             ></Route>
             <Route
               exact

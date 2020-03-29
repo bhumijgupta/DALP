@@ -21,7 +21,7 @@ export class WebcamStudent extends Component {
   };
 
   componentDidMount = () => {
-    this.key = setInterval(this.capture, 1500);
+    this.key = setInterval(this.capture, 500);
     // setTimeout(this.capture(), 1000);
   };
 

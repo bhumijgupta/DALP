@@ -27,7 +27,9 @@ export class Video extends Component {
   render() {
     return (
       <div
-        className={"embed-responsive " + this.props.size}
+        className={
+          "embed-responsive video-component rounded-lg " + this.props.size
+        }
         style={{ height: this.props.height }}
       >
         <video

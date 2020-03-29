@@ -1,3 +1,21 @@
 .teacher-dashboard .content {
   margin-top: 36px;
 }
+
+.text-muted {
+  font-weight: 600;
+  color: black !important;
+}
+
+h3 {
+  margin-bottom: 0;
+}
+
+div.student-name {
+  max-height: 390px;
+  overflow-y: scroll;
+}
+
+button {
+  font-weight: 600 !important;
+}

@@ -12,6 +12,7 @@ export class Teacher extends Component {
     name: "",
     courseName: "",
     courseId: null,
+    quiz: null,
     redirect: false
   };
 

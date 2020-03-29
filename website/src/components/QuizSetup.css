@@ -1,0 +1,12 @@
+.quiz-setup form {
+  font-weight: 600;
+}
+
+.quiz-setup form button {
+  width: 100%;
+}
+
+.quiz-setup .title {
+  font-weight: 600;
+  font-size: 1.4rem;
+}

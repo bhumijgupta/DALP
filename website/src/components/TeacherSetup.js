@@ -3,11 +3,13 @@ import { Redirect } from "react-router-dom";
 import LoadingPermission from "./LoadingPermission";
 import NavBar from "./NavBar";
 import Video from "./Video";
+import QuizSetup from "./QuizSetup";
 
 export class TeacherSetup extends Component {
   state = {
     permission: null,
-    stream: null
+    stream: null,
+    redirect: false
   };
 
   componentDidMount = () => {
@@ -38,8 +40,12 @@ export class TeacherSetup extends Component {
     else if (this.state.permission !== true) {
       return <LoadingPermission loading={this.state.permission} />;
     }
-    // Redirect to dashboard page if permission is done
+    // Show quiz page if permission is done
     else if (this.state.permission === true) {
+      return <QuizSetup handleCreateQuiz={this.props.handleCreateQuiz} />;
+    }
+    // Redirect to dashboard
+    else if (this.state.redirect === true) {
       return <Redirect to="/teacher/dashboard"></Redirect>;
     }
     // TODO: implement feature of choosing video and sudio source

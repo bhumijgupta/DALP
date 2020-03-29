@@ -5,3 +5,22 @@
 .navbar {
   font-weight: 600;
 }
+
+nav .navbar-brand {
+  font-weight: 800;
+}
+
+nav.navbar {
+  background: #56ccf2; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    45deg,
+    #2267c2,
+    #56acf2
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(45deg, #2267c2, #56acf2);
+  box-shadow: 0 0 7px 0px #1d2124;
+}
+
+nav {
+  color: white;
+}
