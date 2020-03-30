@@ -26,6 +26,10 @@ io.on("connection", socket => {
     const user = getCurrentUser(socket.id);
     io.to(user.room).emit("r-test", data);
   });
+  socket.on("s-call", () => {
+    const user = getCurrentUser(socket.id);
+    io.to(user.room).emit("r-call");
+  });
   //TRANSCRIPT
   //teacher will keep on sending the text at s-trans
   socket.on("s-trans", data => {
@@ -36,9 +40,20 @@ io.on("connection", socket => {
   //QUIZ
   //teacher will trigger start-quiz at s-quiz
   socket.on("s-quiz", data => {
-    //student will receive the quix at r-quiz
+    //student will receive the quiz at r-quiz
     const user = getCurrentUser(socket.id);
     io.to(user.room).emit("r-quiz", data);
+  });
+  // Student sends back his marks to teacher
+  socket.on("r-quiz-submit", data => {
+    const user = getCurrentUser(socket.id);
+    // Reciever will recieve marks on s-quiz-submit
+    io.to(user.room).emit("s-quiz-submit", data);
+  });
+  // SEND IMAGE
+  socket.on("s-image", image => {
+    const user = getCurrentUser(socket.id);
+    io.to(user.room).emit("r-image", image);
   });
   //PDF-LINK
   //teacher will send the pdf link at s-link
