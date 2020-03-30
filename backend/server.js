@@ -7,7 +7,8 @@ const express = require("express"),
   config = require("config"),
   app = express(),
   port = process.env.PORT || 8080,
-  noCache = require("nocache");
+  noCache = require("nocache"),
+  server = require("http").Server(app);
 //Instanciating a peer server
 var ExpressPeerServer = require("peer").ExpressPeerServer;
 const options = {
@@ -47,7 +48,6 @@ if (config.util.getEnv("NODE_ENV") !== "test") {
   // log HTTP requests
   app.use(morgan("combined"));
 }
-
 //Requiring Routes
 const readingRoutes = require("./routes/Courses");
 
@@ -55,7 +55,7 @@ const readingRoutes = require("./routes/Courses");
 app.use("/api/course", readingRoutes);
 
 //Starting the server
-const server = app.listen(port, err => {
+server.listen(port, err => {
   if (err) throw err;
   console.log(`Server running at port ${port}`);
 });
