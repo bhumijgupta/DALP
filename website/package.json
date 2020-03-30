@@ -9,6 +9,7 @@
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
     "face-api.js": "^0.22.2",
+    "microsoft-cognitiveservices-speech-sdk": "^1.10.1",
     "peerjs": "^1.2.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
