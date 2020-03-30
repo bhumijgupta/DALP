@@ -3,7 +3,7 @@ import NavBar from "./NavBar";
 import "./TeacherDashboard.css";
 import Video from "./Video";
 import Peer from "peerjs";
-
+import io from "socket.io-client";
 export class TeacherDashboard extends Component {
   state = {
     stream: null,
@@ -31,7 +31,9 @@ export class TeacherDashboard extends Component {
       "Suresh",
       "Raj"
     ],
-    conn: null
+    conn: null,
+    socket: null,
+    socketSet: false
   };
 
   componentDidMount = () => {
@@ -41,12 +43,16 @@ export class TeacherDashboard extends Component {
       port: 8080,
       path: "/myapp"
     });
-    console.log(this.props.TeacherState.courseId);
+    //Initialising the socket and setting the state to be used anywhere
+    const socket = io(`http://localhost:8081`);
+    this.setState({ socket, socketSet: true });
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then(stream => {
         console.log("Teacher Streaming successfully.");
         //Setting teacher's video
+        //IMPORTANT: DO NOT SET ANY STATE BEFORE THIS
+        this.setState({ socketSet: false });
         this.setState({ stream });
       })
       .catch(err => {
@@ -61,15 +67,18 @@ export class TeacherDashboard extends Component {
       call.answer(this.state.stream);
     });
   };
-
-  onStreamBtnClick = () => {
-    if (this.state.streaming) {
-      this.setState({ streaming: false });
-    } else {
-      console.log("sending data");
-      this.state.conn.send("start");
-      this.setState({ streaming: true });
+  //Join the room once the socket is set
+  componentDidUpdate = () => {
+    if (this.state.socketSet) {
+      this.state.socket.emit("join-room", {
+        room: this.props.TeacherState.courseId,
+        username: this.props.TeacherState.name
+      });
+      console.log("Teacher joined the room");
     }
+  };
+  onStreamBtnClick = () => {
+    this.state.socket.emit("s-test", "Your teacher sent test data.");
   };
 
   getAllNames = () => {
@@ -108,9 +117,7 @@ export class TeacherDashboard extends Component {
                       display: this.state.streaming ? "inline-block" : "none"
                     }}
                   ></span>
-                  {this.state.streaming
-                    ? "  Stop Streaming"
-                    : "Start Streaming"}
+                  Test Socket
                 </button>
               </div>
             </div>
@@ -139,7 +146,10 @@ export class TeacherDashboard extends Component {
                     {this.props.TeacherState.quizTitle}
                   </h5>
                   <p class="card-text">
-                    No. of questions: {this.props.TeacherState.quiz.length}
+                    No. of questions:{" "}
+                    {this.props.TeacherState.quiz === null
+                      ? 0
+                      : this.props.TeacherState.quiz.length}
                   </p>
                   <button className="btn btn-outline-primary">
                     Launch Quiz

@@ -6,7 +6,6 @@ import WhiteBtnOutline from "./WhiteBtnOutline";
 import BrandHeader from "./BrandHeader";
 import CourseCreated from "./CourseCreated";
 import "./TeacherLogin.css";
-
 export class Teacher extends Component {
   state = {
     name: "",
