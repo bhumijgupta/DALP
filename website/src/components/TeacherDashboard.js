@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Peer from "peerjs";
 import io from "socket.io-client";
 import { Redirect } from "react-router-dom";
+import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
 import NavBar from "./NavBar";
 import "./TeacherDashboard.css";
@@ -16,7 +17,10 @@ export class TeacherDashboard extends Component {
     socket: null,
     socketSet: false,
     quizSent: false,
-    quizResults: []
+    quizResults: [],
+    phraseDiv: "",
+    statusDiv: "",
+    reco: ""
   };
 
   componentDidMount = () => {
@@ -24,7 +28,7 @@ export class TeacherDashboard extends Component {
       this.canvas = React.createRef();
       //Initialising the peer
       const peer = new Peer(this.props.TeacherState.courseId, {
-        host: "localhost",
+        host: "127.0.0.1",
         port: 8080,
         path: "/myapp"
       });
@@ -67,11 +71,118 @@ export class TeacherDashboard extends Component {
     }
   };
 
+  //Start Recording
+  startSpeechRecognition = () => {
+    var lastRecognized = "";
+    var phraseDivx = "";
+    var statusDivx = "";
+
+    var audioConfig;
+
+    // audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+
+    var pushStream = SpeechSDK.AudioInputStream.createPushStream();
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        pushStream.write(stream);
+        console.log(stream);
+        console.log("STATE");
+        console.log(this.state.stream);
+
+        // audioConfig = SpeechSDK.AudioConfig.fromStreamInput(pushStream);
+      });
+
+    // pushStream.write(this.state.stream);
+    // audioConfig = SpeechSDK.AudioConfig.fromStreamInput(pushStream);
+
+    var speechConfig;
+    speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
+      "9711663ef014426fbf2140be66f96488",
+      "centralindia"
+    );
+
+    speechConfig.speechRecognitionLanguage = "en-US";
+
+    var reco;
+    reco = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+
+    //Set reco to state here???
+
+    reco.recognizing = (s, e) => {
+      console.log("RECO.RECOGNIZING");
+
+      console.log(e.result.text);
+
+      phraseDivx = lastRecognized + e.result.text;
+      this.setState({
+        phraseDiv: phraseDivx,
+        statusDiv: statusDivx
+      });
+    };
+    reco.recognized = (s, e) => {
+      console.log("RECO.RECOGNIZED");
+
+      console.log(e.result.text);
+
+      // Indicates that recognizable speech was not detected, and that recognition is done.
+      if (e.result.reason === SpeechSDK.ResultReason.NoMatch) {
+        var noMatchDetail = SpeechSDK.NoMatchDetails.fromResult(e.result);
+
+        statusDivx +=
+          SpeechSDK.ResultReason[e.result.reason] +
+          SpeechSDK.NoMatchReason[noMatchDetail.reason];
+
+        //window.console.log(statusDivx);
+      } else {
+        statusDivx +=
+          "(recognized)  Reason: " +
+          SpeechSDK.ResultReason[e.result.reason] +
+          " Text: " +
+          e.result.text +
+          "\r\n";
+        //window.console.log(statusDivx);
+      }
+
+      lastRecognized += e.result.text + "\r\n";
+      phraseDivx = lastRecognized;
+      window.console.log("PHRASEDIVX");
+      window.console.log(phraseDivx);
+
+      this.setState(prevState => ({
+        phraseDiv: phraseDivx,
+        //   statusDiv: statusDivx,
+        reco: reco
+      }));
+    };
+
+    // Starts recognition
+    reco.startContinuousRecognitionAsync();
+  };
+
+  // Stop Speech Recognition
+  stopSpeechRecognition = () => {
+    // window.console.log(this.state.reco)
+
+    this.state.reco.stopContinuousRecognitionAsync(
+      function() {
+        this.state.reco.close();
+        this.setState({ reco: undefined });
+      },
+      function(err) {
+        this.state.reco.close();
+        this.setState({ reco: undefined });
+      }
+    );
+  };
+
   // Start streaming
   onStreamBtnClick = () => {
     if (this.state.streaming === true) {
       clearInterval(this.state.intervalKey);
       this.setState({ streaming: false, intervalKey: null });
+
+      // this.stopSpeechRecognition();
     } else {
       this.setState({ streaming: true });
       // Ask recievers to class teacher
@@ -79,13 +190,15 @@ export class TeacherDashboard extends Component {
       // Start sending screenshots
       let key = setInterval(this.sendScreenshot, 3000);
       this.setState({ intervalKey: key });
+
       // TODO: Allandhir implement transcript sending
+      // this.startSpeechRecognition();
     }
   };
 
   getAllNames = () => {
-    return this.state.joineeList.map(name => {
-      return <div>{name}</div>;
+    return this.state.joineeList.map((name, index) => {
+      return <div key={index}>{name}</div>;
     });
   };
 
@@ -166,9 +279,9 @@ export class TeacherDashboard extends Component {
           {this.props.TeacherState.quizTitle} - Result
         </h5>
         <div className="card-text">
-          {this.state.quizResults.map(({ name, marks }) => {
+          {this.state.quizResults.map(({ name, marks }, index) => {
             return (
-              <div>
+              <div key={index}>
                 {name} - {marks}
               </div>
             );
