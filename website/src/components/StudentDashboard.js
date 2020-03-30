@@ -17,15 +17,6 @@ export class StudentDashboard extends Component {
     socketSet: false
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      this.state.slowConnection === true &&
-      this.state.remoteStream !== null
-    ) {
-      this.setState({ remoteStream: null });
-    }
-  }
-
   componentDidMount = () => {
     //Initiating a peer
     var peer = new Peer(null, {
@@ -71,7 +62,13 @@ export class StudentDashboard extends Component {
       });
     //socket.emit("s-test", "Hello I am student");
   };
-  componentDidUpdate = () => {
+  componentDidUpdate = (prevProps,prevState) => {
+    if (
+      this.state.slowConnection === true &&
+      this.state.remoteStream !== null
+    ) {
+      this.setState({ remoteStream: null });
+    }
     if (this.state.socketSet) {
       this.state.socket.emit("join-room", {
         room: this.props.StudentState.courseId,
