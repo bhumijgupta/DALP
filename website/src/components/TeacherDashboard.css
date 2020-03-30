@@ -19,3 +19,14 @@ div.student-name {
 button {
   font-weight: 600 !important;
 }
+
+.webcam-container {
+  z-index: -2;
+  position: absolute;
+  top: 0;
+  margin-top: 30px;
+}
+
+canvas {
+  display: none;
+}

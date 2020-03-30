@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import Peer from "peerjs";
+
 import NavBar from "./NavBar";
 import "./TeacherDashboard.css";
 import Video from "./Video";
@@ -6,6 +8,7 @@ import Peer from "peerjs";
 import io from "socket.io-client";
 export class TeacherDashboard extends Component {
   state = {
+    img: "",
     stream: null,
     streaming: false,
     view: "activity",
@@ -34,9 +37,11 @@ export class TeacherDashboard extends Component {
     conn: null,
     socket: null,
     socketSet: false
+ 
   };
 
   componentDidMount = () => {
+    this.canvas = React.createRef();
     //Initialising the peer
     const peer = new Peer(this.props.TeacherState.courseId, {
       host: "localhost",
@@ -87,6 +92,32 @@ export class TeacherDashboard extends Component {
     });
   };
 
+  getAudioStream = () => {
+    return this.state.stream.getAudioTracks()[0];
+  };
+
+  getScreenshot = () => {
+    let mediaStreamTrack = this.state.stream.getVideoTracks()[0];
+    console.log(mediaStreamTrack.getSettings());
+    let imageCapture = new ImageCapture(mediaStreamTrack);
+    imageCapture.grabFrame().then(bitMap => {
+      this.ctx = this.canvas.current.getContext("2d");
+      this.ctx.imageSmoothingEnabled = true;
+      // Brighten up the image
+      this.ctx.filter = "brightness(150%)";
+      // Draw frame on canvas
+      this.ctx.drawImage(
+        bitMap,
+        0,
+        0,
+        this.canvas.current.width,
+        this.canvas.current.height
+      );
+      let imgurl = this.canvas.current.toDataURL();
+      console.log(imgurl);
+    });
+  };
+
   // TODO: redirect to home page if not authenticated
   render() {
     return (
@@ -119,6 +150,12 @@ export class TeacherDashboard extends Component {
                   ></span>
                   Test Socket
                 </button>
+                <button
+                  className="btn btn-primary btn-md"
+                  onClick={this.getScreenshot}
+                >
+                  ClickImage
+                </button>
               </div>
             </div>
             <div className="col-md-3">
@@ -142,7 +179,7 @@ export class TeacherDashboard extends Component {
             <div className="col-md">
               <div className="card">
                 <div className="card-body">
-                  <h5 class="card-title">
+                  <h5 className="card-title">
                     {this.props.TeacherState.quizTitle}
                   </h5>
                   <p class="card-text">
@@ -150,7 +187,6 @@ export class TeacherDashboard extends Component {
                     {this.props.TeacherState.quiz === null
                       ? 0
                       : this.props.TeacherState.quiz.length}
-                  </p>
                   <button className="btn btn-outline-primary">
                     Launch Quiz
                   </button>
@@ -158,6 +194,8 @@ export class TeacherDashboard extends Component {
               </div>
             </div>
           </div>
+
+          <canvas ref={this.canvas} width={640} height={480}></canvas>
         </div>
       </div>
     );

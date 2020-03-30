@@ -4,7 +4,7 @@ import LoadingPermission from "./LoadingPermission";
 import "./StudentSetup.css";
 import GradientContainer from "./GradientContainer";
 import BrandHeader from "./BrandHeader";
-import WebcamStudent from "./WebcamStudent";
+import Webcam from "./Webcam";
 import { loadModel, detectFaces } from "../utils/faceapi";
 
 export class StudentSetup extends Component {
@@ -81,7 +81,7 @@ export class StudentSetup extends Component {
             <div className="col-md-6 com-sm-12 text-center">
               <div className="title text-center">Proctoring</div>
               <br />
-              <WebcamStudent getImage={this.getImage} />
+              <Webcam interval={500} getImage={this.getImage} />
               <br />
               <b>Status: Cannot find face</b>
               <br />
