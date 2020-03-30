@@ -11,9 +11,13 @@
 
 `{"dbURI":"YOUR DATABASE URI"}`
 
-## Running
+## Running the main server
 
 `npm start`
+
+## Running the socket server
+
+`npm run socket`
 
 ## Testing
 
