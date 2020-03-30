@@ -1,11 +1,14 @@
 import React, { Component } from "react";
-import Video from "./Video";
 import Peer from "peerjs";
+import io from "socket.io-client";
+
 import NavBar from "./NavBar";
-import "./StudentDashboard.css";
+import Video from "./Video";
 import Transcript from "./Transcript";
 import QuizView from "./QuizView";
-import io from "socket.io-client";
+
+import "./StudentDashboard.css";
+
 export class StudentDashboard extends Component {
   state = {
     myStream: null,
@@ -14,7 +17,11 @@ export class StudentDashboard extends Component {
     marks: null,
     showQuiz: false,
     socket: null,
-    socketSet: false
+    socketSet: false,
+    quiz: [],
+    quizTitle: "",
+    imgSrc: "https://via.placeholder.com/720/480",
+    peer: null
   };
 
   componentDidMount = () => {
@@ -35,25 +42,19 @@ export class StudentDashboard extends Component {
         //IMPORTANT: DO NOT SET ANY STATE BEFORE THIS
         this.setState({ socketSet: false });
         //Setting student's stream
-        this.setState({ myStream: stream });
-        // let npeer = peer.connect(this.props.StudentState.courseId);
-        // npeer.on("open", () => {
-        //   console.log("connected");
-        // });
-        // npeer.on("data", () => {
-        //   console.log("data recieved");
-        //   var call = peer.call(this.props.StudentState.courseId, stream);
-        //   call.on("stream", remoteStream => {
-        //     //Setting remoteStream i.e teacher's stream
-        //     console.log("Teacher stream reached");
-        //     this.setState({ remoteStream });
-        //   });
-        // });
-        var call = peer.call(this.props.StudentState.courseId, stream);
-        call.on("stream", remoteStream => {
-          //Setting remoteStream i.e teacher's stream
-          console.log("Teacher stream reached");
-          this.setState({ remoteStream });
+        this.setState({ myStream: stream, peer });
+        // If r-call recieved, call teacher
+        socket.on("r-call", () => {
+          console.log("calling teacher");
+          var call = this.state.peer.call(
+            this.props.StudentState.courseId,
+            this.state.myStream
+          );
+          call.on("stream", remoteStream => {
+            //Setting remoteStream i.e teacher's stream
+            console.log("Teacher stream reached");
+            this.setState({ remoteStream });
+          });
         });
       })
       .catch(err => {
@@ -62,17 +63,32 @@ export class StudentDashboard extends Component {
       });
     //socket.emit("s-test", "Hello I am student");
   };
-  componentDidUpdate = (prevProps,prevState) => {
+  // TODO: Show loading is not streaming
+  componentDidUpdate = (prevProps, prevState) => {
     if (
       this.state.slowConnection === true &&
       this.state.remoteStream !== null
     ) {
+      // Set incoming stream to null
       this.setState({ remoteStream: null });
+      // Start listening for incoming images
+      this.state.socket.on("r-image", img => {
+        console.log("image recieved");
+        this.setState({ imgSrc: img });
+      });
     }
     if (this.state.socketSet) {
       this.state.socket.emit("join-room", {
         room: this.props.StudentState.courseId,
         username: this.props.StudentState.name
+      });
+      // listen for quiz start
+      this.state.socket.on("r-quiz", quiz => {
+        this.setState({
+          showQuiz: true,
+          quiz: quiz.quiz,
+          quizTitle: quiz.title
+        });
       });
       this.state.socket.on("r-test", data => {
         console.log("Testing socket ", data);
@@ -82,6 +98,9 @@ export class StudentDashboard extends Component {
     }
   };
   submitMarks = marks => {
+    // send quiz marks
+    this.state.socket.emit("r-quiz-submit", marks);
+    // revert to normal stream
     this.setState({ marks, showQuiz: false });
   };
 
@@ -93,7 +112,7 @@ export class StudentDashboard extends Component {
           <div className="text-muted mb-2">Image refreshed every 3 sec</div>
           <div className="image">
             <img
-              src="https://via.placeholder.com/720/480"
+              src={this.state.imgSrc}
               className="img-fluid rounded"
               alt="live screenshot"
             />
@@ -126,8 +145,8 @@ export class StudentDashboard extends Component {
       return (
         <QuizView
           submitMarks={this.submitMarks}
-          questions={this.props.TeacherState.quiz}
-          title={this.props.TeacherState.quizTitle}
+          questions={this.state.quiz}
+          title={this.state.quizTitle}
         />
       );
     }

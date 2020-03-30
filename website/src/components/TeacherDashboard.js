@@ -1,43 +1,21 @@
 import React, { Component } from "react";
 import Peer from "peerjs";
+import io from "socket.io-client";
+import { Redirect } from "react-router-dom";
 
 import NavBar from "./NavBar";
 import "./TeacherDashboard.css";
 import Video from "./Video";
-import Peer from "peerjs";
-import io from "socket.io-client";
 export class TeacherDashboard extends Component {
   state = {
     img: "",
     stream: null,
     streaming: false,
     view: "activity",
-    joineeList: [
-      "Rahul",
-      "Naman",
-      "Suresh",
-      "Raj",
-      "Rahul",
-      "Naman",
-      "Suresh",
-      "Raj",
-      "Rahul",
-      "Naman",
-      "Suresh",
-      "Raj",
-      "Rahul",
-      "Naman",
-      "Suresh",
-      "Raj",
-      "Rahul",
-      "Naman",
-      "Suresh",
-      "Raj"
-    ],
+    joineeList: [],
     conn: null,
     socket: null,
     socketSet: false
- 
   };
 
   componentDidMount = () => {
@@ -68,8 +46,8 @@ export class TeacherDashboard extends Component {
     //Asking the teacher to respond to the student call
     peer.on("call", call => {
       console.log("Student called the teacher !!");
-      //Sending the stream back
-      call.answer(this.state.stream);
+      //Sending the stream back only is streaming
+      if (this.state.streaming) call.answer(this.state.stream);
     });
   };
   //Join the room once the socket is set
@@ -82,10 +60,18 @@ export class TeacherDashboard extends Component {
       console.log("Teacher joined the room");
     }
   };
+
+  // Start streaming
   onStreamBtnClick = () => {
-    this.state.socket.emit("s-test", "Your teacher sent test data.");
+    this.setState({ streaming: true });
+    // Ask recievers to class teacher
+    this.state.socket.emit("s-call");
+    // Start sending screenshots
+    setInterval(this.sendScreenshot, 3000);
+    // TODO: Allandhir implement transcript sending
   };
 
+  // TODO: implement present students
   getAllNames = () => {
     return this.state.joineeList.map(name => {
       return <div>{name}</div>;
@@ -96,30 +82,52 @@ export class TeacherDashboard extends Component {
     return this.state.stream.getAudioTracks()[0];
   };
 
+  sendScreenshot = async () => {
+    let imgurl = await this.getScreenshot();
+    console.log(imgurl);
+    this.state.socket.emit("s-image", imgurl);
+  };
+
+  // TODO: Chandak screenshot
   getScreenshot = () => {
-    let mediaStreamTrack = this.state.stream.getVideoTracks()[0];
-    console.log(mediaStreamTrack.getSettings());
-    let imageCapture = new ImageCapture(mediaStreamTrack);
-    imageCapture.grabFrame().then(bitMap => {
-      this.ctx = this.canvas.current.getContext("2d");
-      this.ctx.imageSmoothingEnabled = true;
-      // Brighten up the image
-      this.ctx.filter = "brightness(150%)";
-      // Draw frame on canvas
-      this.ctx.drawImage(
-        bitMap,
-        0,
-        0,
-        this.canvas.current.width,
-        this.canvas.current.height
-      );
-      let imgurl = this.canvas.current.toDataURL();
-      console.log(imgurl);
+    return new Promise((resolve, reject) => {
+      let mediaStreamTrack = this.state.stream.getVideoTracks()[0];
+      // console.log(mediaStreamTrack.getSettings());
+      let imageCapture = new ImageCapture(mediaStreamTrack);
+      imageCapture.grabFrame().then(bitMap => {
+        this.ctx = this.canvas.current.getContext("2d");
+        this.ctx.imageSmoothingEnabled = true;
+        // Brighten up the image
+        this.ctx.filter = "brightness(150%)";
+        // Draw frame on canvas
+        this.ctx.drawImage(
+          bitMap,
+          0,
+          0,
+          this.canvas.current.width,
+          this.canvas.current.height
+        );
+        let imgurl = this.canvas.current.toDataURL();
+        resolve(imgurl);
+      });
     });
   };
 
-  // TODO: redirect to home page if not authenticated
+  onQuizSend = () => {
+    console.log("Sending quiz");
+    this.state.socket.emit("s-quiz", {
+      quiz: this.props.TeacherState.quiz,
+      title: this.props.TeacherState.quizTitle
+    });
+    this.state.socket.on("s-quiz-submit", data => {
+      console.log(data);
+    });
+  };
+
   render() {
+    if (!this.props.TeacherAuth) {
+      return <Redirect to="/teacher"></Redirect>;
+    }
     return (
       <div className="teacher-dashboard mb-3">
         <NavBar name={this.props.TeacherState.name} />
@@ -148,19 +156,13 @@ export class TeacherDashboard extends Component {
                       display: this.state.streaming ? "inline-block" : "none"
                     }}
                   ></span>
-                  Test Socket
-                </button>
-                <button
-                  className="btn btn-primary btn-md"
-                  onClick={this.getScreenshot}
-                >
-                  ClickImage
+                  {this.state.streaming ? "Stop" : "Start"} streaming
                 </button>
               </div>
             </div>
             <div className="col-md-3">
               <div className="classroom-title mb-2">
-                <h3>Quiz</h3>
+                <h3>Classroom</h3>
                 <span className="text-muted">
                   Strength: {this.state.joineeList.length}
                 </span>
@@ -182,20 +184,24 @@ export class TeacherDashboard extends Component {
                   <h5 className="card-title">
                     {this.props.TeacherState.quizTitle}
                   </h5>
-                  <p class="card-text">
+                  <p className="card-text">
                     No. of questions:{" "}
                     {this.props.TeacherState.quiz === null
                       ? 0
                       : this.props.TeacherState.quiz.length}
-                  <button className="btn btn-outline-primary">
+                  </p>
+                  <button
+                    className="btn btn-outline-primary"
+                    onClick={this.onQuizSend}
+                  >
                     Launch Quiz
                   </button>
                 </div>
               </div>
             </div>
-          </div>
 
-          <canvas ref={this.canvas} width={640} height={480}></canvas>
+            <canvas ref={this.canvas} width={640} height={480}></canvas>
+          </div>
         </div>
       </div>
     );
