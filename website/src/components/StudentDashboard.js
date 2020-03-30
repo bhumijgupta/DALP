@@ -4,9 +4,16 @@ import Peer from "peerjs";
 import NavBar from "./NavBar";
 import "./StudentDashboard.css";
 import Transcript from "./Transcript";
+import QuizView from "./QuizView";
 
 export class StudentDashboard extends Component {
-  state = { myStream: null, remoteStream: null, slowConnection: false };
+  state = {
+    myStream: null,
+    remoteStream: null,
+    slowConnection: false,
+    marks: null,
+    showQuiz: false
+  };
 
   componentDidUpdate(prevProps, prevState) {
     if (
@@ -56,20 +63,26 @@ export class StudentDashboard extends Component {
         console.log("Error while streaming student's stream.", err);
       });
   };
+
+  submitMarks = marks => {
+    this.setState({ marks, showQuiz: false });
+  };
+
   showImage = () => {
-    return (
-      <>
-        <h3>Image feed</h3>
-        <div className="text-muted mb-2">Image refreshed every 3 sec</div>
-        <div className="image">
-          <img
-            src="https://via.placeholder.com/720/480"
-            className="img-fluid rounded"
-            alt="image feed"
-          />
-        </div>
-      </>
-    );
+    if (this)
+      return (
+        <>
+          <h3>Image feed</h3>
+          <div className="text-muted mb-2">Image refreshed every 3 sec</div>
+          <div className="image">
+            <img
+              src="https://via.placeholder.com/720/480"
+              className="img-fluid rounded"
+              alt="live screenshot"
+            />
+          </div>
+        </>
+      );
   };
   showStream = () => {
     return (
@@ -92,6 +105,15 @@ export class StudentDashboard extends Component {
     console.log("recieved");
   };
   render() {
+    if (this.state.showQuiz) {
+      return (
+        <QuizView
+          submitMarks={this.submitMarks}
+          questions={this.props.TeacherState.quiz}
+          title={this.props.TeacherState.quizTitle}
+        />
+      );
+    }
     return (
       <div className="student-dashboard mb-3">
         <NavBar name={this.props.StudentState.name} />

@@ -1,0 +1,17 @@
+.quiz-view {
+  font-weight: 500;
+}
+
+.quiz-view .header {
+  font-size: 2em;
+  font-weight: 600;
+}
+
+.quiz-view .title {
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.quiz-view button {
+  width: 100%;
+}
