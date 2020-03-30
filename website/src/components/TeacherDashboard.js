@@ -11,44 +11,47 @@ export class TeacherDashboard extends Component {
     img: "",
     stream: null,
     streaming: false,
-    view: "activity",
     joineeList: [],
-    conn: null,
+    intervalKey: null,
     socket: null,
-    socketSet: false
+    socketSet: false,
+    quizSent: false,
+    quizResults: []
   };
 
   componentDidMount = () => {
-    this.canvas = React.createRef();
-    //Initialising the peer
-    const peer = new Peer(this.props.TeacherState.courseId, {
-      host: "localhost",
-      port: 8080,
-      path: "/myapp"
-    });
-    //Initialising the socket and setting the state to be used anywhere
-    const socket = io(`http://localhost:8081`);
-    this.setState({ socket, socketSet: true });
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        console.log("Teacher Streaming successfully.");
-        //Setting teacher's video
-        //IMPORTANT: DO NOT SET ANY STATE BEFORE THIS
-        this.setState({ socketSet: false });
-        this.setState({ stream });
-      })
-      .catch(err => {
-        //If teacher hasn't given the permission
-        //TODO:Error component
-        console.log("Error accessing teacher's stream.", err);
+    if (this.props.TeacherAuth) {
+      this.canvas = React.createRef();
+      //Initialising the peer
+      const peer = new Peer(this.props.TeacherState.courseId, {
+        host: "localhost",
+        port: 8080,
+        path: "/myapp"
       });
-    //Asking the teacher to respond to the student call
-    peer.on("call", call => {
-      console.log("Student called the teacher !!");
-      //Sending the stream back only is streaming
-      if (this.state.streaming) call.answer(this.state.stream);
-    });
+      //Initialising the socket and setting the state to be used anywhere
+      const socket = io(`http://localhost:8081`);
+      this.setState({ socket, socketSet: true });
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then(stream => {
+          console.log("Teacher Streaming successfully.");
+          //Setting teacher's video
+          //IMPORTANT: DO NOT SET ANY STATE BEFORE THIS
+          this.setState({ socketSet: false });
+          this.setState({ stream });
+        })
+        .catch(err => {
+          //If teacher hasn't given the permission
+          //TODO:Error component
+          console.log("Error accessing teacher's stream.", err);
+        });
+      //Asking the teacher to respond to the student call
+      peer.on("call", call => {
+        console.log("Student called the teacher !!");
+        //Sending the stream back only is streaming
+        if (this.state.streaming) call.answer(this.state.stream);
+      });
+    }
   };
   //Join the room once the socket is set
   componentDidUpdate = () => {
@@ -58,20 +61,28 @@ export class TeacherDashboard extends Component {
         username: this.props.TeacherState.name
       });
       console.log("Teacher joined the room");
+      this.state.socket.on("student-join", data => {
+        this.setState({ joineeList: [...this.state.joineeList, data] });
+      });
     }
   };
 
   // Start streaming
   onStreamBtnClick = () => {
-    this.setState({ streaming: true });
-    // Ask recievers to class teacher
-    this.state.socket.emit("s-call");
-    // Start sending screenshots
-    setInterval(this.sendScreenshot, 3000);
-    // TODO: Allandhir implement transcript sending
+    if (this.state.streaming === true) {
+      clearInterval(this.state.intervalKey);
+      this.setState({ streaming: false, intervalKey: null });
+    } else {
+      this.setState({ streaming: true });
+      // Ask recievers to class teacher
+      this.state.socket.emit("s-call");
+      // Start sending screenshots
+      let key = setInterval(this.sendScreenshot, 3000);
+      this.setState({ intervalKey: key });
+      // TODO: Allandhir implement transcript sending
+    }
   };
 
-  // TODO: implement present students
   getAllNames = () => {
     return this.state.joineeList.map(name => {
       return <div>{name}</div>;
@@ -84,7 +95,7 @@ export class TeacherDashboard extends Component {
 
   sendScreenshot = async () => {
     let imgurl = await this.getScreenshot();
-    console.log(imgurl);
+    // console.log(imgurl);
     this.state.socket.emit("s-image", imgurl);
   };
 
@@ -107,8 +118,15 @@ export class TeacherDashboard extends Component {
           this.canvas.current.width,
           this.canvas.current.height
         );
-        let imgurl = this.canvas.current.toDataURL();
-        resolve(imgurl);
+        this.canvas.current.toBlob(
+          data => {
+            // console.log(data);
+            resolve(data);
+          },
+          "image/png",
+          0.5
+        );
+        // let imgurl = this.canvas.current.toDataURL();
       });
     });
   };
@@ -120,8 +138,44 @@ export class TeacherDashboard extends Component {
       title: this.props.TeacherState.quizTitle
     });
     this.state.socket.on("s-quiz-submit", data => {
-      console.log(data);
+      this.setState({ quizResults: [...this.state.quizResults, data] });
     });
+    this.setState({ quizSent: true });
+  };
+  quizContainer = () => {
+    return (
+      <>
+        <h5 className="card-title">{this.props.TeacherState.quizTitle}</h5>
+        <div className="card-text">
+          No. of questions:{" "}
+          {this.props.TeacherState.quiz === null
+            ? 0
+            : this.props.TeacherState.quiz.length}
+        </div>
+        <button className="btn btn-outline-primary" onClick={this.onQuizSend}>
+          Launch Quiz
+        </button>
+      </>
+    );
+  };
+
+  quizLeaderboard = () => {
+    return (
+      <>
+        <h5 className="card-title">
+          {this.props.TeacherState.quizTitle} - Result
+        </h5>
+        <div className="card-text">
+          {this.state.quizResults.map(({ name, marks }) => {
+            return (
+              <div>
+                {name} - {marks}
+              </div>
+            );
+          })}
+        </div>
+      </>
+    );
   };
 
   render() {
@@ -181,21 +235,9 @@ export class TeacherDashboard extends Component {
             <div className="col-md">
               <div className="card">
                 <div className="card-body">
-                  <h5 className="card-title">
-                    {this.props.TeacherState.quizTitle}
-                  </h5>
-                  <p className="card-text">
-                    No. of questions:{" "}
-                    {this.props.TeacherState.quiz === null
-                      ? 0
-                      : this.props.TeacherState.quiz.length}
-                  </p>
-                  <button
-                    className="btn btn-outline-primary"
-                    onClick={this.onQuizSend}
-                  >
-                    Launch Quiz
-                  </button>
+                  {this.state.quizSent
+                    ? this.quizLeaderboard()
+                    : this.quizContainer()}
                 </div>
               </div>
             </div>

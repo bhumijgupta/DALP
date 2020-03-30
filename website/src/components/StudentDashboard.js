@@ -8,6 +8,7 @@ import Transcript from "./Transcript";
 import QuizView from "./QuizView";
 
 import "./StudentDashboard.css";
+import { Redirect } from "react-router-dom";
 
 export class StudentDashboard extends Component {
   state = {
@@ -73,8 +74,8 @@ export class StudentDashboard extends Component {
       this.setState({ remoteStream: null });
       // Start listening for incoming images
       this.state.socket.on("r-image", img => {
-        console.log("image recieved");
-        this.setState({ imgSrc: img });
+        let imgNew = new Blob([img]);
+        this.setState({ imgSrc: URL.createObjectURL(imgNew) });
       });
     }
     if (this.state.socketSet) {
@@ -99,7 +100,10 @@ export class StudentDashboard extends Component {
   };
   submitMarks = marks => {
     // send quiz marks
-    this.state.socket.emit("r-quiz-submit", marks);
+    this.state.socket.emit("r-quiz-submit", {
+      name: this.props.StudentState.name,
+      marks
+    });
     // revert to normal stream
     this.setState({ marks, showQuiz: false });
   };
@@ -137,10 +141,10 @@ export class StudentDashboard extends Component {
     );
   };
 
-  getImage = src => {
-    console.log("recieved");
-  };
   render() {
+    if (!this.props.StudentAuth) {
+      return <Redirect to="/student" />;
+    }
     if (this.state.showQuiz) {
       return (
         <QuizView

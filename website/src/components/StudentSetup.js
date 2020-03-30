@@ -48,11 +48,15 @@ export class StudentSetup extends Component {
     // Draw on canvas and use canvas to detect face
     image.onload = async () => {
       ctx.drawImage(image, 0, 0, 350, 350);
-      let resp = await detectFaces("canvas");
-      console.log(resp);
-      // If face detected, change state and redirect to /student/dashboard
-      if (resp) {
-        this.setState({ faceDetect: true });
+      try {
+        let resp = await detectFaces("canvas");
+        console.log(resp);
+        // If face detected, change state and redirect to /student/dashboard
+        if (resp) {
+          this.setState({ faceDetect: true });
+        }
+      } catch (e) {
+        console.log(e);
       }
     };
     image.src = imageSrc;
