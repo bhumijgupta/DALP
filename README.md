@@ -32,7 +32,7 @@ Most of the students are not endowed with a high bandwidth internet connection. 
 
 ## Running the project locally
 
-1. Deploy the azure function
+1. [Deploy the azure function](/dalp-generate-pdf)
 2. Start the backend servers
    - Set mongoDB URI in config folder
 
