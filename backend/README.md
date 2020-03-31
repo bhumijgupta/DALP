@@ -11,6 +11,12 @@
 
 `{"dbURI":"YOUR DATABASE URI"}`
 
+## Running the peer.js server
+```cmd
+npm install -g peer
+peerjs --port 9000 --key peerjs --path /myapp
+```
+
 ## Running the main server
 
 `npm start`
