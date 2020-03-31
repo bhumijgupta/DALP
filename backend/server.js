@@ -61,16 +61,16 @@ server.listen(port, err => {
 });
 
 //Peer server
-const peerServer = ExpressPeerServer(server, options);
-app.use("/myapp", peerServer);
+// const peerServer = ExpressPeerServer(server, options);
+// app.use("/myapp", peerServer);
 
-peerServer.on("connection", id => {
-  console.log(`Connected : ${id.id}`);
-  //console.log(server._clients);
-});
+// peerServer.on("connection", id => {
+//   console.log(`Connected : ${id.id}`);
+//   //console.log(server._clients);
+// });
 
-peerServer.on("disconnect", id => {
-  console.log(`Disconnected : ${id.id}`);
-});
+// peerServer.on("disconnect", id => {
+//   console.log(`Disconnected : ${id.id}`);
+// });
 
 module.exports = app; // for testing

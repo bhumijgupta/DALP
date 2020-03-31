@@ -5,7 +5,8 @@ function NavBar(props) {
   return (
     <nav className="navbar navbar-dark">
       <a className="navbar-brand" href="/">
-        D<span className="brand-a">A</span>L P
+        D<span className="brand-a">A</span>L P&nbsp;&nbsp;&nbsp;&nbsp;
+        {props.dashboardTitle}
       </a>
       <div className="my-2 my-lg-0">
         <span>Logged in as {props.name}</span>

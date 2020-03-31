@@ -30,8 +30,8 @@ export class TeacherDashboard extends Component {
       this.canvas = React.createRef();
       //Initialising the peer
       const peer = new Peer(this.props.TeacherState.courseId, {
-        host: "127.0.0.1",
-        port: 8080,
+        host: "localhost",
+        port: 9000,
         path: "/myapp"
       });
       //Initialising the socket and setting the state to be used anywhere
@@ -374,7 +374,10 @@ export class TeacherDashboard extends Component {
     }
     return (
       <div className="teacher-dashboard mb-3">
-        <NavBar name={this.props.TeacherState.name} />
+        <NavBar
+          name={this.props.TeacherState.name}
+          dashboardTitle={"Teacher Dashboard"}
+        />
         <div className="container content">
           <div className="row">
             <div className="col-md">
