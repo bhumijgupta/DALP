@@ -20,7 +20,8 @@ export class TeacherDashboard extends Component {
     quizResults: [],
     phraseDiv: "",
     statusDiv: "",
-    reco: ""
+    reco: null
+   
   };
 
   componentDidMount = () => {
@@ -99,7 +100,7 @@ export class TeacherDashboard extends Component {
 
     var speechConfig;
     speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
-      "9711663ef014426fbf2140be66f96488",
+      "9cff78d9e7c54afdaa0016d8e3849135",
       "centralindia"
     );
 
@@ -107,6 +108,11 @@ export class TeacherDashboard extends Component {
 
     var reco;
     reco = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+    console.log(reco)
+    
+    console.log("RECOOOOOOO")
+    console.log(this.state.reco)
+    console.log(this.state.s)
 
     //Set reco to state here???
 
@@ -150,20 +156,23 @@ export class TeacherDashboard extends Component {
       window.console.log("PHRASEDIVX");
       window.console.log(phraseDivx);
 
-      this.setState(prevState => ({
+      this.setState({
         phraseDiv: phraseDivx,
         //   statusDiv: statusDivx,
-        reco: reco
-      }));
+      });
     };
 
     // Starts recognition
-    reco.startContinuousRecognitionAsync();
+    this.setState({
+      reco: reco,
+    }, () => this.state.reco.startContinuousRecognitionAsync());
+  
   };
 
   // Stop Speech Recognition
   stopSpeechRecognition = () => {
-    // window.console.log(this.state.reco)
+    console.log("STOP")
+    console.log(this.state.reco)
 
     this.state.reco.stopContinuousRecognitionAsync(
       function() {
@@ -183,7 +192,7 @@ export class TeacherDashboard extends Component {
       clearInterval(this.state.intervalKey);
       this.setState({ streaming: false, intervalKey: null });
 
-      // this.stopSpeechRecognition();
+      this.stopSpeechRecognition();
     } else {
       this.setState({ streaming: true });
       // Ask recievers to class teacher
@@ -193,7 +202,7 @@ export class TeacherDashboard extends Component {
       this.setState({ intervalKey: key });
 
       // TODO: Allandhir implement transcript sending
-      // this.startSpeechRecognition();
+      this.startSpeechRecognition();
     }
   };
 
