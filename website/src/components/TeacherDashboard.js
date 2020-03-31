@@ -222,6 +222,7 @@ export class TeacherDashboard extends Component {
         console.log(json);
         if (json.type !== "error") {
           console.log(json.data);
+          this.setState({ pdfLink: json.data, pdfCall: false });
           this.state.socket.emit("s-link", json.data);
         }
       });

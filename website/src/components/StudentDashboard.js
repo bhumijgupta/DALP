@@ -52,8 +52,8 @@ export class StudentDashboard extends Component {
         });
       });
 
-      this.state.socket.on("r-link", pdfLink => {
-        this.setState({ pdfLink });
+      this.state.socket.on("r-link", pdfFile => {
+        this.setState({ pdfFile });
       });
     });
     console.log("socket init");
