@@ -203,9 +203,7 @@ export class TeacherDashboard extends Component {
     const postBody = JSON.stringify({
       transcripts: this.state.phraseDiv,
       classID: this.props.TeacherState.courseName,
-      screenshots: [
-        "iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAh1BMVEUxMjH8/v8tLixQUVEYGhjU0tT29/ghHx/P0dIhIiEnKScVFhXm6OqCf4CnqKnW1dUbHBvb3N/JyMlYVVUAAAANDwyGh4lEPz8kJSO5u734+vuwsLGdnJ3v8PFBQUEqKSlJSklfX1+enp+Uk5Vzc3N5d3cBBgC9v8CDhIRpaGloZGVFRkY6OjlfBncRAAADPklEQVR4nO3Z6XKiQBSGYWQIkUUFAw4ad03U0fu/vlGkEfXQahFTUvU+vxJz6PQnbS9oGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACeyBQ9UCrX5tckjmVZQaKrKmn3duN3cf6IpJbNqVyraT3x/iz6zWazO5x5TmmV3GxqVjmgN2+IYqHW6si1H2VvtOsMR3nVaB64YpX5V2421U2qBlyUtCwmbD6W0FvaZ3X2LHg0YVfqxyOsXlnTP5Awbl9V9qSImoRv3tMC/kDCYCiUboSBWp4wFO/5A4J1acDqCc0PqXTwSELfqziTJq3ygNUTemEh1+nHz+sZtSyhH1QMaG47b0rWBT9/QRwfKuGpLNWZCj0xt6qjq5mbuMs8r3Vduwvztvxjkb3/sTupvBaagZWJsoa/vtUrQj9OCdenspTUk0RN0pv48Gc36me/L4VxmrcUZWvXW7TfJFTNV+RlCVvygpV3JEvY05elEtXX7+yFKFsZh7oFzsmm3474DlfwhISqryMvK3YXq/7eaqG7uE4J1T1s+MvguJdxg5T22ldJ2IoKH8KSQVdYLOz+l2c5d00br5LQDwvmJRFjv1EQtj/iO0K+SsIz/ZIjgzm7KBy1x+KsW1SrhIZzvWNaGTdOCvVKaAQb+6p6qV/lapZwfzy8Pl18ae9i3RLue5z0Lk/NY91n8VUSht0C7Qp+eIxhtPrFaXWlG6evknAdBydll8RH5mGwepNefvsHE81/eJWE9+xp4sbgoDE7DkrX26rThXQSUWqVMNtof6q+ukaWUDrmK3VKGKhhuVXFUbZ2/KvBPWxF8Rmpy656BGSPj0d1a6Mi1yChPTozEJ9iTPLZsz1NLMdQJ2Jbu7q8SMJLYkKn+KjNP+1u9OtnnRIaVigW7+qw4t+X0Nxdb0v3s5TuFtYsoeGO/avSof4hds0SGqb3eV442tzo+dMSWuHA3ruVMOimZZfKv3sygvHn6cunsGfdWkiTduPQ4qD5o48SD5z31K0j+ORdpLnMdOLpejhvz4ebnXfHRiH7D1W/UvtdppskTpLcEQ8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAL/oP5BU3wQ/BxT8AAAAASUVORK5CYII="
-      ]
+      screenshots: []
     });
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
     const url = "https://dalp-generate-pdf.azurewebsites.net/api/GeneratePDF";
@@ -222,11 +220,9 @@ export class TeacherDashboard extends Component {
       .then(response => response.json())
       .then(json => {
         console.log(json);
-        const resp = json.resp;
-        if (resp.type !== "error") {
-          console.log(resp.data);
-          this.setState({ pdfCall: false, pdfLink: resp.data });
-          this.state.socket.emit("s-link", resp.data);
+        if (json.type !== "error") {
+          console.log(json.data);
+          this.state.socket.emit("s-link", json.data);
         }
       });
   };
