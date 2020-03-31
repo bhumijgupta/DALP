@@ -45,3 +45,13 @@ An endpoint will be output in the terminal which you can use for testing.
 
  
 Find tutorial to [Create and deploy serverless Azure Functions in Python with Visual Studio Code](https://docs.microsoft.com/en-us/azure/developer/python/tutorial-vs-code-serverless-python-01)
+
+# Azure Blob Storage
+
+## Environment Variables
+Store connection string, which you can get from azure portal in the `local.settings.json` file.
+
+## Quickstart: Manage blobs with Python v12 SDK
+Find quickstart guide [here](https://docs.microsoft.com/en-in/azure/storage/blobs/storage-quickstart-blobs-python) and python docs [here](https://azure-storage.readthedocs.io/index.html).
+
+
