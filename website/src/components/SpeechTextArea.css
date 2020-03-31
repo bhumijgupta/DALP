@@ -38,13 +38,13 @@ textarea {
 }
 
 #wrapper {
-  width: 700px;
+  width: 40%;
   height: auto;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 24px;
-  margin-bottom: 100px;
+  /* margin-top: 24px;
+  margin-bottom: 100px; */
   position: absolute;
-  left: 2%;
-  top: 2%;
+  right: 2%;
+  top: 20%;
 }

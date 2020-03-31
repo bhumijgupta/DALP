@@ -6,6 +6,7 @@ import NavBar from "./NavBar";
 import Video from "./Video";
 import Transcript from "./Transcript";
 import QuizView from "./QuizView";
+import SpeechTextArea from "./SpeechTextArea";
 
 import "./StudentDashboard.css";
 import { Redirect } from "react-router-dom";
@@ -22,7 +23,9 @@ export class StudentDashboard extends Component {
     quiz: [],
     quizTitle: "",
     imgSrc: "https://via.placeholder.com/720/480",
-    peer: null
+    peer: null,
+    transcripts: "", // r-trans -> append the text to this
+    partial: "" //r-partial-> update this to the text, r-trans -> ""
   };
 
   componentDidMount = () => {
@@ -34,7 +37,24 @@ export class StudentDashboard extends Component {
     });
     //Initialising the socket and setting the state to be used anywhere
     const socket = io(`http://localhost:8081`);
-    this.setState({ socket, socketSet: true });
+    this.setState({ socket, socketSet: true }, () => {
+      this.state.socket.on("r-partial", partial => {
+        this.setState({
+          partial: partial
+        });
+      });
+
+      this.state.socket.on("r-trans", trans => {
+        this.setState({
+          transcripts: this.state.transcripts + " " + trans,
+          partial: ""
+        });
+      });
+
+      this.state.socket.on("r-link", pdfLink => {
+        console.log(pdfLink);
+      });
+    });
     console.log("socket init");
     console.log("peer initialized");
     navigator.mediaDevices
@@ -163,6 +183,11 @@ export class StudentDashboard extends Component {
               {this.state.slowConnection ? this.showImage() : this.showStream()}
             </div>
             <Transcript showTranscript={this.state.slowConnection} />
+            {this.state.slowConnection && (
+              <SpeechTextArea
+                phrase={this.state.transcripts + " " + this.state.partial}
+              />
+            )}
           </div>
         </div>
       </div>

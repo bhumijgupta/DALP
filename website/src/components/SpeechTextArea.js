@@ -8,6 +8,10 @@ class SpeechTextArea extends Component {
     this.textLog = React.createRef();
   }
 
+  componentDidUpdate() {
+    this.textLog.current.scrollTop = this.textLog.current.scrollHeight;
+  }
+
   render() {
     return (
       <div>
