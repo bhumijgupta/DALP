@@ -31,12 +31,21 @@ io.on("connection", socket => {
     io.to(user.room).emit("r-call");
   });
   //TRANSCRIPT
+
+  //teacher will keep on sending the partial text at s-partial
+  socket.on("s-partial", data => {
+    //student will receive the text at r-trans
+    const user = getCurrentUser(socket.id);
+    io.to(user.room).emit("r-partial", data);
+  });
+
   //teacher will keep on sending the text at s-trans
   socket.on("s-trans", data => {
     //student will receive the text at r-trans
     const user = getCurrentUser(socket.id);
     io.to(user.room).emit("r-trans", data);
   });
+
   //QUIZ
   //teacher will trigger start-quiz at s-quiz
   socket.on("s-quiz", data => {

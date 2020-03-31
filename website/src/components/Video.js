@@ -11,6 +11,10 @@ export class Video extends Component {
     this.vidRef.current.srcObject = this.props.src;
   };
 
+  componentDidMount() {
+    if (this.props.returnRef !== null) this.props.returnRef(this.vidRef);
+  }
+
   render() {
     return (
       <div
@@ -30,5 +34,9 @@ export class Video extends Component {
     );
   }
 }
+
+Video.defaultProps = {
+  returnRef: null
+};
 
 export default Video;

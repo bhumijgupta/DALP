@@ -2,10 +2,12 @@ import React, { Component } from "react";
 import Peer from "peerjs";
 import io from "socket.io-client";
 import { Redirect } from "react-router-dom";
+import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 
 import NavBar from "./NavBar";
 import "./TeacherDashboard.css";
 import Video from "./Video";
+// import Axios from "axios";
 export class TeacherDashboard extends Component {
   state = {
     img: "",
@@ -16,7 +18,11 @@ export class TeacherDashboard extends Component {
     socket: null,
     socketSet: false,
     quizSent: false,
-    quizResults: []
+    quizResults: [],
+    phraseDiv: "",
+    pdfLink: null,
+    reco: null,
+    pdfCall: false
   };
 
   componentDidMount = () => {
@@ -24,7 +30,7 @@ export class TeacherDashboard extends Component {
       this.canvas = React.createRef();
       //Initialising the peer
       const peer = new Peer(this.props.TeacherState.courseId, {
-        host: "localhost",
+        host: "127.0.0.1",
         port: 8080,
         path: "/myapp"
       });
@@ -61,36 +67,179 @@ export class TeacherDashboard extends Component {
         username: this.props.TeacherState.name
       });
       console.log("Teacher joined the room");
+      // TODO: check for student leaving
       this.state.socket.on("student-join", data => {
         this.setState({ joineeList: [...this.state.joineeList, data] });
       });
     }
   };
 
+  //Start Recording
+  startSpeechRecognition = () => {
+    var lastRecognized = "";
+    var phraseDivx = "";
+
+    var audioConfig;
+
+    // audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+
+    var pushStream = SpeechSDK.AudioInputStream.createPushStream();
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        pushStream.write(stream);
+        // console.log(stream);
+        console.log("STATE");
+        // console.log(this.state.stream);
+
+        // audioConfig = SpeechSDK.AudioConfig.fromStreamInput(pushStream);
+      });
+
+    // pushStream.write(this.state.stream);
+    // audioConfig = SpeechSDK.AudioConfig.fromStreamInput(pushStream);
+
+    var speechConfig;
+    speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
+      "9cff78d9e7c54afdaa0016d8e3849135",
+      "centralindia"
+    );
+
+    speechConfig.speechRecognitionLanguage = "en-US";
+
+    var reco;
+    reco = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+    console.log(reco);
+
+    // console.log("RECOOOOOOO");
+    // console.log(this.state.reco);
+    // console.log(this.state.s);
+
+    //Set reco to state here???
+
+    reco.recognizing = (s, e) => {
+      // console.log("RECO.RECOGNIZING");
+
+      // console.log(e.result.text);
+
+      phraseDivx = lastRecognized + e.result.text;
+
+      if (e.result.text) this.state.socket.emit("s-partial", e.result.text);
+
+      this.setState({
+        phraseDiv: phraseDivx
+      });
+    };
+    reco.recognized = (s, e) => {
+      console.log("RECO.RECOGNIZED");
+      console.log(e.result.text);
+
+      if (e.result.text) this.state.socket.emit("s-trans", e.result.text);
+
+      lastRecognized += e.result.text + "\r\n";
+      phraseDivx = lastRecognized;
+      window.console.log("PHRASEDIVX");
+      window.console.log(phraseDivx);
+
+      this.setState({
+        phraseDiv: phraseDivx
+        //   statusDiv: statusDivx,
+      });
+    };
+
+    // Starts recognition
+    this.setState(
+      {
+        reco: reco
+      },
+      () => {
+        this.state.reco.startContinuousRecognitionAsync();
+        this.setState({ streamingButtonDisabled: false });
+      }
+    );
+  };
+
+  // Stop Speech Recognition
+  stopSpeechRecognition = () => {
+    console.log("STOP");
+    console.log(this.state.reco);
+
+    this.state.reco.stopContinuousRecognitionAsync(
+      function() {
+        this.state.reco.close();
+        this.setState({ reco: undefined });
+      },
+      function(err) {
+        this.state.reco.close();
+        this.setState({ reco: undefined });
+      }
+    );
+  };
+
   // Start streaming
   onStreamBtnClick = () => {
     if (this.state.streaming === true) {
       clearInterval(this.state.intervalKey);
-      this.setState({ streaming: false, intervalKey: null });
+      this.setState({ streaming: false, intervalKey: null, pdfCall: true });
+
+      this.stopSpeechRecognition();
+      this.getPdfLink();
     } else {
       this.setState({ streaming: true });
       // Ask recievers to class teacher
       this.state.socket.emit("s-call");
       // Start sending screenshots
       let key = setInterval(this.sendScreenshot, 3000);
-      this.setState({ intervalKey: key });
+
+      this.setState({ intervalKey: key, streamingButtonDisabled: true }, () => {
+        this.startSpeechRecognition();
+      });
+
       // TODO: Allandhir implement transcript sending
     }
   };
 
+  //Send POST request to Azure function to get PDF link
+  getPdfLink = () => {
+    const postBody = JSON.stringify({
+      transcripts: this.state.phraseDiv,
+      classID: this.props.TeacherState.courseName,
+      screenshots: []
+    });
+    const proxyurl = "https://cors-anywhere.herokuapp.com/";
+    const url = "https://dalp-generate-pdf.azurewebsites.net/api/GeneratePDF";
+    fetch(proxyurl + url, {
+      // Adding method type
+      method: "POST",
+      // Adding body or contents to send
+      body: postBody,
+      // Adding headers to the request
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    })
+      .then(response => response.json())
+      .then(json => {
+        console.log(json);
+        if (json.type !== "error") {
+          console.log(json.data);
+          this.setState({ pdfLink: json.data, pdfCall: false });
+          this.state.socket.emit("s-link", json.data);
+        }
+      });
+  };
+
   getAllNames = () => {
-    return this.state.joineeList.map(name => {
-      return <div>{name}</div>;
+    return this.state.joineeList.map((name, index) => {
+      return <div key={index}>{name}</div>;
     });
   };
 
   getAudioStream = () => {
     return this.state.stream.getAudioTracks()[0];
+  };
+
+  getVideoRef = ref => {
+    this.video = ref;
   };
 
   sendScreenshot = async () => {
@@ -102,32 +251,26 @@ export class TeacherDashboard extends Component {
   // TODO: Chandak screenshot
   getScreenshot = () => {
     return new Promise((resolve, reject) => {
-      let mediaStreamTrack = this.state.stream.getVideoTracks()[0];
-      // console.log(mediaStreamTrack.getSettings());
-      let imageCapture = new ImageCapture(mediaStreamTrack);
-      imageCapture.grabFrame().then(bitMap => {
-        this.ctx = this.canvas.current.getContext("2d");
-        this.ctx.imageSmoothingEnabled = true;
-        // Brighten up the image
-        this.ctx.filter = "brightness(150%)";
-        // Draw frame on canvas
-        this.ctx.drawImage(
-          bitMap,
-          0,
-          0,
-          this.canvas.current.width,
-          this.canvas.current.height
-        );
-        this.canvas.current.toBlob(
-          data => {
-            // console.log(data);
-            resolve(data);
-          },
-          "image/png",
-          0.5
-        );
-        // let imgurl = this.canvas.current.toDataURL();
-      });
+      this.ctx = this.canvas.current.getContext("2d");
+      this.ctx.imageSmoothingEnabled = true;
+      // Brighten up the image
+      this.ctx.filter = "brightness(150%)";
+      // Draw frame on canvas
+      this.ctx.drawImage(
+        this.video.current,
+        0,
+        0,
+        this.canvas.current.width,
+        this.canvas.current.height
+      );
+      this.canvas.current.toBlob(
+        data => {
+          // console.log(data);
+          resolve(data);
+        },
+        "image/png",
+        0.5
+      );
     });
   };
 
@@ -142,6 +285,7 @@ export class TeacherDashboard extends Component {
     });
     this.setState({ quizSent: true });
   };
+
   quizContainer = () => {
     return (
       <>
@@ -166,9 +310,9 @@ export class TeacherDashboard extends Component {
           {this.props.TeacherState.quizTitle} - Result
         </h5>
         <div className="card-text">
-          {this.state.quizResults.map(({ name, marks }) => {
+          {this.state.quizResults.map(({ name, marks }, index) => {
             return (
-              <div>
+              <div key={index}>
                 {name} - {marks}
               </div>
             );
@@ -176,6 +320,52 @@ export class TeacherDashboard extends Component {
         </div>
       </>
     );
+  };
+
+  showCorrectBtn = () => {
+    // If no pdfcall is under process and no pdfLink is present
+    if (this.state.pdfCall === false && this.state.pdfLink === null)
+      return (
+        <button
+          className="btn btn-primary btn-md"
+          onClick={this.onStreamBtnClick}
+          disabled={this.state.streamingButtonDisabled}
+        >
+          <span
+            className="spinner-grow spinner-grow-sm"
+            role="status"
+            aria-hidden="true"
+            style={{
+              display: this.state.streaming ? "inline-block" : "none"
+            }}
+          ></span>
+          {this.state.streaming ? "Stop" : "Start"} streaming
+        </button>
+      );
+    else {
+      return (
+        <button
+          className="btn btn-primary btn-md"
+          disabled={this.state.pdfCall}
+        >
+          <span
+            className="spinner-grow spinner-grow-sm"
+            role="status"
+            aria-hidden="true"
+            style={{
+              display: this.state.pdfCall ? "inline-block" : "none"
+            }}
+          ></span>
+          {this.state.pdfCall ? (
+            "Processing Notes"
+          ) : (
+            <a href={this.state.pdfLink} target="_blank">
+              View Notes
+            </a>
+          )}
+        </button>
+      );
+    }
   };
 
   render() {
@@ -196,23 +386,12 @@ export class TeacherDashboard extends Component {
                   Course ID: {this.props.TeacherState.courseId}
                 </span>
               </div>
-              <Video src={this.state.stream} size="embed-responsive-16by9" />
-              <div className="text-center mt-3">
-                <button
-                  className="btn btn-primary btn-md"
-                  onClick={this.onStreamBtnClick}
-                >
-                  <span
-                    className="spinner-grow spinner-grow-sm"
-                    role="status"
-                    aria-hidden="true"
-                    style={{
-                      display: this.state.streaming ? "inline-block" : "none"
-                    }}
-                  ></span>
-                  {this.state.streaming ? "Stop" : "Start"} streaming
-                </button>
-              </div>
+              <Video
+                src={this.state.stream}
+                returnRef={this.getVideoRef}
+                size="embed-responsive-16by9"
+              />
+              <div className="text-center mt-3">{this.showCorrectBtn()}</div>
             </div>
             <div className="col-md-3">
               <div className="classroom-title mb-2">
