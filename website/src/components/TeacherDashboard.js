@@ -65,6 +65,7 @@ export class TeacherDashboard extends Component {
         username: this.props.TeacherState.name
       });
       console.log("Teacher joined the room");
+      // TODO: check for student leaving
       this.state.socket.on("student-join", data => {
         this.setState({ joineeList: [...this.state.joineeList, data] });
       });
@@ -86,9 +87,9 @@ export class TeacherDashboard extends Component {
       .getUserMedia({ video: true, audio: true })
       .then(stream => {
         pushStream.write(stream);
-        console.log(stream);
+        // console.log(stream);
         console.log("STATE");
-        console.log(this.state.stream);
+        // console.log(this.state.stream);
 
         // audioConfig = SpeechSDK.AudioConfig.fromStreamInput(pushStream);
       });
@@ -206,6 +207,10 @@ export class TeacherDashboard extends Component {
     return this.state.stream.getAudioTracks()[0];
   };
 
+  getVideoRef = ref => {
+    this.video = ref;
+  };
+
   sendScreenshot = async () => {
     let imgurl = await this.getScreenshot();
     // console.log(imgurl);
@@ -215,32 +220,26 @@ export class TeacherDashboard extends Component {
   // TODO: Chandak screenshot
   getScreenshot = () => {
     return new Promise((resolve, reject) => {
-      let mediaStreamTrack = this.state.stream.getVideoTracks()[0];
-      // console.log(mediaStreamTrack.getSettings());
-      let imageCapture = new ImageCapture(mediaStreamTrack);
-      imageCapture.grabFrame().then(bitMap => {
-        this.ctx = this.canvas.current.getContext("2d");
-        this.ctx.imageSmoothingEnabled = true;
-        // Brighten up the image
-        this.ctx.filter = "brightness(150%)";
-        // Draw frame on canvas
-        this.ctx.drawImage(
-          bitMap,
-          0,
-          0,
-          this.canvas.current.width,
-          this.canvas.current.height
-        );
-        this.canvas.current.toBlob(
-          data => {
-            // console.log(data);
-            resolve(data);
-          },
-          "image/png",
-          0.5
-        );
-        // let imgurl = this.canvas.current.toDataURL();
-      });
+      this.ctx = this.canvas.current.getContext("2d");
+      this.ctx.imageSmoothingEnabled = true;
+      // Brighten up the image
+      this.ctx.filter = "brightness(150%)";
+      // Draw frame on canvas
+      this.ctx.drawImage(
+        this.video.current,
+        0,
+        0,
+        this.canvas.current.width,
+        this.canvas.current.height
+      );
+      this.canvas.current.toBlob(
+        data => {
+          // console.log(data);
+          resolve(data);
+        },
+        "image/png",
+        0.5
+      );
     });
   };
 
@@ -255,6 +254,7 @@ export class TeacherDashboard extends Component {
     });
     this.setState({ quizSent: true });
   };
+
   quizContainer = () => {
     return (
       <>
@@ -309,7 +309,11 @@ export class TeacherDashboard extends Component {
                   Course ID: {this.props.TeacherState.courseId}
                 </span>
               </div>
-              <Video src={this.state.stream} size="embed-responsive-16by9" />
+              <Video
+                src={this.state.stream}
+                returnRef={this.getVideoRef}
+                size="embed-responsive-16by9"
+              />
               <div className="text-center mt-3">
                 <button
                   className="btn btn-primary btn-md"
