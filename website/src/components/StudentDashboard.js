@@ -1,15 +1,14 @@
 import React, { Component } from "react";
 import Peer from "peerjs";
 import io from "socket.io-client";
+import { Redirect } from "react-router-dom";
 
 import NavBar from "./NavBar";
 import Video from "./Video";
-import Transcript from "./Transcript";
 import QuizView from "./QuizView";
 import SpeechTextArea from "./SpeechTextArea";
 
 import "./StudentDashboard.css";
-import { Redirect } from "react-router-dom";
 
 export class StudentDashboard extends Component {
   state = {
@@ -22,7 +21,9 @@ export class StudentDashboard extends Component {
     socketSet: false,
     quiz: [],
     quizTitle: "",
-    imgSrc: "https://via.placeholder.com/720/480",
+    imgSrc:
+      "https://via.placeholder.com/720x480/2267C2/FFFFFF/?text=Fetching+images+...+Please+wait",
+    pdfFile: null,
     peer: null,
     transcripts: "", // r-trans -> append the text to this
     partial: "" //r-partial-> update this to the text, r-trans -> ""
@@ -52,7 +53,7 @@ export class StudentDashboard extends Component {
       });
 
       this.state.socket.on("r-link", pdfLink => {
-        console.log(pdfLink);
+        this.setState({ pdfLink });
       });
     });
     console.log("socket init");
@@ -155,7 +156,9 @@ export class StudentDashboard extends Component {
             this.setState({ slowConnection: true });
           }}
         >
-          <u className="col-blue">Slow connection? Switch to low data mode</u>
+          {this.state.pdfFile === null && (
+            <u className="col-blue">Slow connection? Switch to low data mode</u>
+          )}
         </div>
       </>
     );
@@ -182,13 +185,21 @@ export class StudentDashboard extends Component {
             <div className="col-md">
               {this.state.slowConnection ? this.showImage() : this.showStream()}
             </div>
-            <Transcript showTranscript={this.state.slowConnection} />
             {this.state.slowConnection && (
               <SpeechTextArea
                 phrase={this.state.transcripts + " " + this.state.partial}
               />
             )}
           </div>
+          {this.state.pdfFile !== null && (
+            <div className="row">
+              <div className="col-md text-center">
+                <a href={this.state.pdfFile} target="_blank">
+                  <button className="btn btn-primary btn-md">View Notes</button>
+                </a>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );

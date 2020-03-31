@@ -14,15 +14,18 @@ class SpeechTextArea extends Component {
 
   render() {
     return (
-      <div>
-        <div id="wrapper">
-          <textarea
-            ref={this.textLog}
-            id="text"
-            name="text"
-            value={this.props.phrase}
-          ></textarea>
+      <div className="col-md-4">
+        <div className="transcript-container title mb-2">
+          <h3 className="mb-2">Transcript</h3>
         </div>
+        <textarea
+          ref={this.textLog}
+          id="text"
+          name="text"
+          value={this.props.phrase}
+          readOnly
+          className="mt-3"
+        ></textarea>
       </div>
     );
   }

@@ -20,8 +20,9 @@ export class TeacherDashboard extends Component {
     quizSent: false,
     quizResults: [],
     phraseDiv: "",
+    pdfLink: null,
     reco: null,
-    streamingButtonDisabled: false
+    pdfCall: false
   };
 
   componentDidMount = () => {
@@ -178,7 +179,7 @@ export class TeacherDashboard extends Component {
   onStreamBtnClick = () => {
     if (this.state.streaming === true) {
       clearInterval(this.state.intervalKey);
-      this.setState({ streaming: false, intervalKey: null });
+      this.setState({ streaming: false, intervalKey: null, pdfCall: true });
 
       this.stopSpeechRecognition();
       this.getPdfLink();
@@ -224,6 +225,7 @@ export class TeacherDashboard extends Component {
         const resp = json.resp;
         if (resp.type !== "error") {
           console.log(resp.data);
+          this.setState({ pdfCall: false, pdfLink: resp.data });
           this.state.socket.emit("s-link", resp.data);
         }
       });
@@ -323,6 +325,52 @@ export class TeacherDashboard extends Component {
     );
   };
 
+  showCorrectBtn = () => {
+    // If no pdfcall is under process and no pdfLink is present
+    if (this.state.pdfCall === false && this.state.pdfLink === null)
+      return (
+        <button
+          className="btn btn-primary btn-md"
+          onClick={this.onStreamBtnClick}
+          disabled={this.state.streamingButtonDisabled}
+        >
+          <span
+            className="spinner-grow spinner-grow-sm"
+            role="status"
+            aria-hidden="true"
+            style={{
+              display: this.state.streaming ? "inline-block" : "none"
+            }}
+          ></span>
+          {this.state.streaming ? "Stop" : "Start"} streaming
+        </button>
+      );
+    else {
+      return (
+        <button
+          className="btn btn-primary btn-md"
+          disabled={this.state.pdfCall}
+        >
+          <span
+            className="spinner-grow spinner-grow-sm"
+            role="status"
+            aria-hidden="true"
+            style={{
+              display: this.state.pdfCall ? "inline-block" : "none"
+            }}
+          ></span>
+          {this.state.pdfCall ? (
+            "Processing Notes"
+          ) : (
+            <a href={this.state.pdfLink} target="_blank">
+              View Notes
+            </a>
+          )}
+        </button>
+      );
+    }
+  };
+
   render() {
     if (!this.props.TeacherAuth) {
       return <Redirect to="/teacher"></Redirect>;
@@ -346,23 +394,7 @@ export class TeacherDashboard extends Component {
                 returnRef={this.getVideoRef}
                 size="embed-responsive-16by9"
               />
-              <div className="text-center mt-3">
-                <button
-                  className="btn btn-primary btn-md"
-                  onClick={this.onStreamBtnClick}
-                  disabled={this.state.streamingButtonDisabled}
-                >
-                  <span
-                    className="spinner-grow spinner-grow-sm"
-                    role="status"
-                    aria-hidden="true"
-                    style={{
-                      display: this.state.streaming ? "inline-block" : "none"
-                    }}
-                  ></span>
-                  {this.state.streaming ? "Stop" : "Start"} streaming
-                </button>
-              </div>
+              <div className="text-center mt-3">{this.showCorrectBtn()}</div>
             </div>
             <div className="col-md-3">
               <div className="classroom-title mb-2">
