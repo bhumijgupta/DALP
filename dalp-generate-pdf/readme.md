@@ -34,14 +34,14 @@ JSON Object with the following key-value pairs
  - The Azure Functions Core Tools.
  - Visual Studio Code with the Azure Functions extension.
 
-## Testing function locally
+### Testing function locally
 
 ```cmd
 func host start
 ```
 An endpoint will be output in the terminal which you can use for testing.
 
-## Deploying function to Azure Functions
+### Deploying function to Azure Functions
 
  
 Find tutorial to [Create and deploy serverless Azure Functions in Python with Visual Studio Code](https://docs.microsoft.com/en-us/azure/developer/python/tutorial-vs-code-serverless-python-01)
