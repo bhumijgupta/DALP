@@ -33,7 +33,7 @@ export class StudentDashboard extends Component {
     //Initiating a peer
     var peer = new Peer(null, {
       host: "localhost",
-      port: 8080,
+      port: 9000,
       path: "/myapp"
     });
     //Initialising the socket and setting the state to be used anywhere
@@ -179,7 +179,10 @@ export class StudentDashboard extends Component {
     }
     return (
       <div className="student-dashboard mb-3">
-        <NavBar name={this.props.StudentState.name} />
+        <NavBar
+          name={this.props.StudentState.name}
+          dashboardTitle={"Student Dashboard"}
+        />
         <div className="container content">
           <div className="row">
             <div className="col-md">

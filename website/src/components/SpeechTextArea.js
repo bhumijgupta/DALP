@@ -14,7 +14,7 @@ class SpeechTextArea extends Component {
 
   render() {
     return (
-      <div className="col-md-4">
+      <div className="col-md-6">
         <div className="transcript-container title mb-2">
           <h3 className="mb-2">Transcript</h3>
         </div>
