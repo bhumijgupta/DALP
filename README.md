@@ -4,11 +4,11 @@
 ## Features
 
 - Real time WebRTC based teaching solution
-- Automatic lecture notes generation
-- In built proctoring support
-- Equipped with functionality to take quizzes/assesments
 - Support for students with low bandwidth connection, i.e. **low bandwidth mode**
 - Automatic transcript generation
+- In built proctoring support
+- Equipped with functionality to take quizzes/assesments
+- Automatic lecture notes generation
 
 ## What is low bandwidth mode
 
@@ -22,7 +22,7 @@ Most of the students are not endowed with a high bandwidth internet connection. 
 1. NodeJS
 2. React JS
 3. Python
-4. Azure - Cognitive Services and Functions
+4. Azure - Cognitive Services, Functions and Blob Storage
 5. MongoDB
 
 ## Aditional Info
