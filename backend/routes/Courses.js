@@ -3,8 +3,13 @@ const sanitizer = require("sanitizer");
 const router = express.Router();
 const Course = require("../models/Course");
 //Room producing function
-//TODO:make 18
 const getRoom = (name, coursename, uniqueId) => {
+  if (name.length < 4) {
+    name += "#".repeat(4 - name.length);
+  }
+  if (coursename.length < 4) {
+    coursename += "#".repeat(4 - coursename.length);
+  }
   const tillFlag = coursename.length > 4 ? 4 : coursename.length;
 
   return (
