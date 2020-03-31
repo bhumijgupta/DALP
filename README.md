@@ -36,15 +36,17 @@ Most of the students are not endowed with a high bandwidth internet connection. 
 2. Start the backend servers
    - Set mongoDB URI in config folder
 
-```
+```cmd
 cd backend
+npm install -g peer
+peerjs --port 9000 --key peerjs --path /myapp
 npm run start
 npm run socket
 ```
 
 3. Start the front end server
 
-```
+```cmd
 cd website
 npm run start
 ```
@@ -55,10 +57,10 @@ npm run start
 
 This platform is proudly made by team `unpaid_interns`
 
-- [Allandhir Megharaj](@allandhir)
-- [Aditya Chandak](@adityachandak287)
-- [Bhumij Gupta](@bhumijgupta)
-- [Yash Mehrota](@YashMeh)
+- [Allandhir Megharaj](https://github.com/allandhir/)
+- [Aditya Chandak](https://github.com/adityachandak287)
+- [Bhumij Gupta](https://github.com/bhumijgupta)
+- [Yash Mehrota](https://github.com/YashMeh)
 
 ## License
 
