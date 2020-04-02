@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm test",
     "start": "export NODE_ENV=dev && nodemon server.js",
-    "socket": "nodemon socketServer.js"
+    "socket": "export NODE_ENV=dev && nodemon socketServer.js"
   },
   "repository": {
     "type": "git",
