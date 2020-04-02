@@ -197,7 +197,11 @@ export class StudentDashboard extends Component {
           {this.state.pdfFile !== null && (
             <div className="row">
               <div className="col-md text-center">
-                <a href={this.state.pdfFile} target="_blank">
+                <a
+                  href={this.state.pdfFile}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <button className="btn btn-primary btn-md">View Notes</button>
                 </a>
               </div>

@@ -11,7 +11,8 @@ export class Student extends Component {
     name: "",
     courseId: "",
     verifyId: null,
-    redirect: false
+    redirect: false,
+    requesting: false
   };
 
   componentDidUpdate = async () => {
@@ -33,7 +34,7 @@ export class Student extends Component {
       name: this.state.name,
       courseId: this.state.courseId
     });
-    this.setState({ redirect: true });
+    this.setState({ redirect: true, requesting: true });
   };
 
   render() {
@@ -81,11 +82,15 @@ export class Student extends Component {
                   ></input>
                   <div className="invalid-feedback">Invalid course ID</div>
                 </div>
+                {/* Disable btn if id not verified, or id is verified and the backend request in sent */}
                 <WhiteBtnOutline
-                  disabled={!(this.state.verifyId === true)}
+                  disabled={
+                    !this.state.verifyId ||
+                    (this.state.verifyId && this.state.requesting)
+                  }
                   onClick={this.handleButtonClick}
                 >
-                  Login
+                  {this.state.requesting ? "Logging in" : "Login"}
                 </WhiteBtnOutline>
               </form>
             </div>

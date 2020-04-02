@@ -27,7 +27,7 @@ export class Video extends Component {
           className="embed-responsive-item"
           ref={this.vidRef}
           autoPlay
-          muted
+          muted={this.props.muted}
           id="video"
         />
       </div>
@@ -36,7 +36,8 @@ export class Video extends Component {
 }
 
 Video.defaultProps = {
-  returnRef: null
+  returnRef: null,
+  muted: false
 };
 
 export default Video;
