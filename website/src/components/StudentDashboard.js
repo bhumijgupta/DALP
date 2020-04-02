@@ -47,7 +47,7 @@ export class StudentDashboard extends Component {
 
       this.state.socket.on("r-trans", trans => {
         this.setState({
-          transcripts: this.state.transcripts + " " + trans,
+          transcripts: (this.state.transcripts + " " + trans).trim(),
           partial: ""
         });
       });
