@@ -71,6 +71,13 @@ export class TeacherDashboard extends Component {
       this.state.socket.on("student-join", data => {
         this.setState({ joineeList: [...this.state.joineeList, data] });
       });
+      this.state.socket.on("student-left", leftStudent => {
+        this.setState({
+          joineeList: this.state.joineeList.filter(
+            student => student !== leftStudent
+          )
+        });
+      });
     }
   };
 
