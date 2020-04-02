@@ -12,11 +12,13 @@ export class Teacher extends Component {
     courseName: "",
     courseId: null,
     quiz: null,
-    redirect: false
+    redirect: false,
+    requesting: false
   };
 
   onFormSubmit = async e => {
     e.preventDefault();
+    this.setState({ requesting: true });
     let resp = await api.post("/new", {
       name: this.state.name,
       coursename: this.state.courseName
@@ -83,7 +85,9 @@ export class Teacher extends Component {
                     required
                   ></input>
                 </div>
-                <WhiteBtnOutline>Submit</WhiteBtnOutline>
+                <WhiteBtnOutline disabled={this.state.requesting}>
+                  {this.state.requesting ? "Creating course" : "Submit"}
+                </WhiteBtnOutline>
               </form>
             </div>
             <div className="col"></div>

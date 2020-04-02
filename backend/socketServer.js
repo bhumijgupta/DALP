@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-app.use(cors());
 const server = require("http").Server(app);
 var io = require("socket.io")(server);
 const port = process.env.S_PORT || 8081;
@@ -11,9 +10,12 @@ const port = process.env.S_PORT || 8081;
 const {
   userJoin,
   getCurrentUser,
-  userLeave,
-  getRoomUsers
+  userLeave
+  // getRoomUsers unused import
 } = require("./utils/socket-functions");
+
+// Enabling cors
+app.use(cors());
 
 io.on("connection", socket => {
   socket.on("join-room", ({ username, room }) => {

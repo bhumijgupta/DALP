@@ -366,7 +366,11 @@ export class TeacherDashboard extends Component {
           {this.state.pdfCall ? (
             "Processing Notes"
           ) : (
-            <a href={this.state.pdfLink} target="_blank">
+            <a
+              href={this.state.pdfLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               View Notes
             </a>
           )}
@@ -399,6 +403,7 @@ export class TeacherDashboard extends Component {
               <Video
                 src={this.state.stream}
                 returnRef={this.getVideoRef}
+                muted={true}
                 size="embed-responsive-16by9"
               />
               <div className="text-center mt-3">{this.showCorrectBtn()}</div>
