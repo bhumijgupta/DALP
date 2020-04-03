@@ -20,6 +20,12 @@ button {
   font-weight: 600 !important;
 }
 
+button > a,
+button > a:hover {
+  color: white !important;
+  text-decoration: none;
+}
+
 canvas {
   display: none;
 }

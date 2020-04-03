@@ -182,15 +182,29 @@ export class TeacherDashboard extends Component {
     );
   };
 
-  // Start streaming
   onStreamBtnClick = () => {
+    // Stop streaming
     if (this.state.streaming === true) {
+      // Stop sending screenshots
       clearInterval(this.state.intervalKey);
-      this.setState({ streaming: false, intervalKey: null, pdfCall: true });
-
+      // Stop speech recognition
       this.stopSpeechRecognition();
+      // stop all stream
+      this.state.stream.getTracks().forEach(track => {
+        track.stop();
+      });
+      // reset state and set pdfCall to true
+      this.setState({
+        streaming: false,
+        intervalKey: null,
+        pdfCall: true,
+        stream: null
+      });
+      // Call for pdf
       this.getPdfLink();
-    } else {
+    }
+    // Start streaming
+    else {
       this.setState({ streaming: true });
       // Ask recievers to class teacher
       this.state.socket.emit("s-call");
@@ -200,8 +214,6 @@ export class TeacherDashboard extends Component {
       this.setState({ intervalKey: key, streamingButtonDisabled: true }, () => {
         this.startSpeechRecognition();
       });
-
-      // TODO: Allandhir implement transcript sending
     }
   };
 
@@ -255,7 +267,6 @@ export class TeacherDashboard extends Component {
     this.state.socket.emit("s-image", imgurl);
   };
 
-  // TODO: Chandak screenshot
   getScreenshot = () => {
     return new Promise((resolve, reject) => {
       this.ctx = this.canvas.current.getContext("2d");
@@ -294,11 +305,14 @@ export class TeacherDashboard extends Component {
   };
 
   quizContainer = () => {
+    if (this.props.TeacherState.quiz.length === 0) {
+      return <h5 className="card-title">No quiz configured</h5>;
+    }
     return (
       <>
         <h5 className="card-title">{this.props.TeacherState.quizTitle}</h5>
-        <div className="card-text">
-          No. of questions:{" "}
+        <div className="card-text mb-2">
+          No. of questions:
           {this.props.TeacherState.quiz === null
             ? 0
             : this.props.TeacherState.quiz.length}
