@@ -22,7 +22,7 @@ export class TeacherDashboard extends Component {
     phraseDiv: "",
     pdfLink: null,
     reco: null,
-    pdfCall: false
+    pdfCall: false,
   };
 
   componentDidMount = () => {
@@ -32,27 +32,27 @@ export class TeacherDashboard extends Component {
       const peer = new Peer(this.props.TeacherState.courseId, {
         host: "localhost",
         port: 9000,
-        path: "/myapp"
+        path: "/myapp",
       });
       //Initialising the socket and setting the state to be used anywhere
       const socket = io(`http://localhost:8081`);
       this.setState({ socket, socketSet: true });
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
-        .then(stream => {
+        .then((stream) => {
           console.log("Teacher Streaming successfully.");
           //Setting teacher's video
           //IMPORTANT: DO NOT SET ANY STATE BEFORE THIS
           this.setState({ socketSet: false });
           this.setState({ stream });
         })
-        .catch(err => {
+        .catch((err) => {
           //If teacher hasn't given the permission
           //TODO:Error component
           console.log("Error accessing teacher's stream.", err);
         });
       //Asking the teacher to respond to the student call
-      peer.on("call", call => {
+      peer.on("call", (call) => {
         console.log("Student called the teacher !!");
         //Sending the stream back only is streaming
         if (this.state.streaming) call.answer(this.state.stream);
@@ -64,20 +64,38 @@ export class TeacherDashboard extends Component {
     if (this.state.socketSet) {
       this.state.socket.emit("join-room", {
         room: this.props.TeacherState.courseId,
-        username: this.props.TeacherState.name
+        username: this.props.TeacherState.name,
       });
       console.log("Teacher joined the room");
       // TODO: check for student leaving
-      this.state.socket.on("student-join", data => {
-        this.setState({ joineeList: [...this.state.joineeList, data] });
-      });
-      this.state.socket.on("student-left", leftStudent => {
-        this.setState({
-          joineeList: this.state.joineeList.filter(
-            student => student !== leftStudent
-          )
+      this.state.socket.on("student-join", (data) => {
+        this.setState((prevState, prevProps) => {
+          return { joineeList: [...prevState.joineeList, data] };
         });
       });
+      this.state.socket.on("student-left", (leftStudent) => {
+        this.setState((prevState, prevProps) => {
+          return {
+            joineeList: prevState.joineeList.filter(
+              (student) => student !== leftStudent
+            ),
+          };
+        });
+      });
+    }
+  };
+
+  componentWillUnmount = () => {
+    //  stop the recording if unexpectedly browser closes
+    if (this.state.reco) {
+      this.state.reco.stopContinuousRecognitionAsync(
+        function () {
+          this.state.reco.close();
+        },
+        function (err) {
+          this.state.reco.close();
+        }
+      );
     }
   };
 
@@ -93,7 +111,7 @@ export class TeacherDashboard extends Component {
     var pushStream = SpeechSDK.AudioInputStream.createPushStream();
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
-      .then(stream => {
+      .then((stream) => {
         pushStream.write(stream);
         // console.log(stream);
         console.log("STATE");
@@ -133,7 +151,7 @@ export class TeacherDashboard extends Component {
       if (e.result.text) this.state.socket.emit("s-partial", e.result.text);
 
       this.setState({
-        phraseDiv: phraseDivx
+        phraseDiv: phraseDivx,
       });
     };
     reco.recognized = (s, e) => {
@@ -148,7 +166,7 @@ export class TeacherDashboard extends Component {
       window.console.log(phraseDivx);
 
       this.setState({
-        phraseDiv: phraseDivx
+        phraseDiv: phraseDivx,
         //   statusDiv: statusDivx,
       });
     };
@@ -156,7 +174,7 @@ export class TeacherDashboard extends Component {
     // Starts recognition
     this.setState(
       {
-        reco: reco
+        reco: reco,
       },
       () => {
         this.state.reco.startContinuousRecognitionAsync();
@@ -171,11 +189,11 @@ export class TeacherDashboard extends Component {
     console.log(this.state.reco);
 
     this.state.reco.stopContinuousRecognitionAsync(
-      function() {
+      function () {
         this.state.reco.close();
         this.setState({ reco: undefined });
       },
-      function(err) {
+      function (err) {
         this.state.reco.close();
         this.setState({ reco: undefined });
       }
@@ -190,7 +208,7 @@ export class TeacherDashboard extends Component {
       // Stop speech recognition
       this.stopSpeechRecognition();
       // stop all stream
-      this.state.stream.getTracks().forEach(track => {
+      this.state.stream.getTracks().forEach((track) => {
         track.stop();
       });
       // reset state and set pdfCall to true
@@ -198,7 +216,7 @@ export class TeacherDashboard extends Component {
         streaming: false,
         intervalKey: null,
         pdfCall: true,
-        stream: null
+        stream: null,
       });
       // Call for pdf
       this.getPdfLink();
@@ -222,7 +240,7 @@ export class TeacherDashboard extends Component {
     const postBody = JSON.stringify({
       transcripts: this.state.phraseDiv,
       classID: this.props.TeacherState.courseName,
-      screenshots: []
+      screenshots: [],
     });
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
     const url = "https://dalp-generate-pdf.azurewebsites.net/api/GeneratePDF";
@@ -233,11 +251,11 @@ export class TeacherDashboard extends Component {
       body: postBody,
       // Adding headers to the request
       headers: {
-        "Content-type": "application/json; charset=UTF-8"
-      }
+        "Content-type": "application/json; charset=UTF-8",
+      },
     })
-      .then(response => response.json())
-      .then(json => {
+      .then((response) => response.json())
+      .then((json) => {
         console.log(json);
         if (json.type !== "error") {
           console.log(json.data);
@@ -257,7 +275,7 @@ export class TeacherDashboard extends Component {
     return this.state.stream.getAudioTracks()[0];
   };
 
-  getVideoRef = ref => {
+  getVideoRef = (ref) => {
     this.video = ref;
   };
 
@@ -282,7 +300,7 @@ export class TeacherDashboard extends Component {
         this.canvas.current.height
       );
       this.canvas.current.toBlob(
-        data => {
+        (data) => {
           // console.log(data);
           resolve(data);
         },
@@ -296,9 +314,9 @@ export class TeacherDashboard extends Component {
     console.log("Sending quiz");
     this.state.socket.emit("s-quiz", {
       quiz: this.props.TeacherState.quiz,
-      title: this.props.TeacherState.quizTitle
+      title: this.props.TeacherState.quizTitle,
     });
-    this.state.socket.on("s-quiz-submit", data => {
+    this.state.socket.on("s-quiz-submit", (data) => {
       this.setState({ quizResults: [...this.state.quizResults, data] });
     });
     this.setState({ quizSent: true });
@@ -357,7 +375,7 @@ export class TeacherDashboard extends Component {
             role="status"
             aria-hidden="true"
             style={{
-              display: this.state.streaming ? "inline-block" : "none"
+              display: this.state.streaming ? "inline-block" : "none",
             }}
           ></span>
           {this.state.streaming ? "Stop" : "Start"} streaming
@@ -374,7 +392,7 @@ export class TeacherDashboard extends Component {
             role="status"
             aria-hidden="true"
             style={{
-              display: this.state.pdfCall ? "inline-block" : "none"
+              display: this.state.pdfCall ? "inline-block" : "none",
             }}
           ></span>
           {this.state.pdfCall ? (

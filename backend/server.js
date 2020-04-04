@@ -10,19 +10,19 @@ const express = require("express"),
   noCache = require("nocache"),
   server = require("http").Server(app);
 //Instanciating a peer server
-var ExpressPeerServer = require("peer").ExpressPeerServer;
-const options = {
-  debug: true,
-  allow_discovery: true
-};
+// var ExpressPeerServer = require("peer").ExpressPeerServer;
+// const options = {
+//   debug: true,
+//   allow_discovery: true
+// };
 //Use the database uri from the ./config directory
 const dbURI = config.dbURI;
 mongoose
   .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(res => {
+  .then((res) => {
     console.log("Database connected successfully.");
   })
-  .catch(err => {
+  .catch((err) => {
     throw err;
   });
 mongoose.set("useFindAndModify", false);
@@ -55,7 +55,7 @@ const readingRoutes = require("./routes/Courses");
 app.use("/api/course", readingRoutes);
 
 //Starting the server
-server.listen(port, err => {
+server.listen(port, (err) => {
   if (err) throw err;
   console.log(`Server running at port ${port}`);
 });

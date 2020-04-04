@@ -15,60 +15,61 @@ import "./App.css";
 
 class App extends Component {
   state = {
-    StudentAuth: false,
-    TeacherAuth: false,
-    TeacherState: null,
-    StudentState: null
-    // TeacherState: {
-    //   name: "Rajvir Thakur",
-    //   courseId: "BhumDJhk31305e7fae",
-    //   courseName: "Introduction to DBMS",
-    //   quiz: [
-    //     {
-    //       title: "What is the third planet from the Sun?",
-    //       option1: "Mercury",
-    //       option2: "Earth",
-    //       answer: 2,
-    //       num: 1
-    //     },
-    //     {
-    //       title: "How many planets are there in the solar system?",
-    //       option1: "8",
-    //       option2: "9",
-    //       answer: 1,
-    //       num: 2
-    //     }
-    //   ],
-    //   quizTitle: "Solar System 1"
-    // },
-    // StudentState: {
-    //   name: "Bhumij Gupta",
-    //   courseId: "BhumDJhk31305e7fae"
-    // }
+    StudentAuth: true,
+    TeacherAuth: true,
+    // TeacherState: null,
+    // StudentState: null
+    TeacherState: {
+      name: "Rajvir Thakur",
+      courseId: "BhumDJhk31305e7fae",
+      courseName: "Introduction to DBMS",
+      quiz: [
+        {
+          title: "What is the third planet from the Sun?",
+          option1: "Mercury",
+          option2: "Earth",
+          answer: 2,
+          num: 1,
+        },
+        {
+          title: "How many planets are there in the solar system?",
+          option1: "8",
+          option2: "9",
+          answer: 1,
+          num: 2,
+        },
+      ],
+      quizTitle: "Solar System 1",
+    },
+    StudentState: {
+      name: "Bhumij Gupta",
+      courseId: "BhumDJhk31305e7fae",
+    },
   };
 
-  handleCreateQuiz = quiz => {
-    console.log(quiz);
-    this.setState({
-      TeacherState: {
-        ...this.state.TeacherState,
-        quiz: quiz.quiz,
-        quizTitle: quiz.title
-      }
+  handleCreateQuiz = (quiz) => {
+    this.setState((prevState, prevProps) => {
+      return {
+        TeacherState: {
+          ...prevState.TeacherState,
+          quiz: quiz.quiz,
+          quizTitle: quiz.title,
+        },
+      };
     });
   };
 
-  handleStudentLogin = StudentState => {
+  handleStudentLogin = (StudentState) => {
     this.setState({
       StudentAuth: true,
-      StudentState
+      StudentState,
     });
   };
 
-  handleTeacherLogin = TeacherState => {
+  handleTeacherLogin = (TeacherState) => {
     this.setState({
       TeacherAuth: true,
-      TeacherState
+      TeacherState,
     });
   };
   render() {

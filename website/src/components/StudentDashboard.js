@@ -15,7 +15,6 @@ export class StudentDashboard extends Component {
     myStream: null,
     remoteStream: null,
     slowConnection: false,
-    marks: null,
     showQuiz: false,
     socket: null,
     socketSet: false,
@@ -26,7 +25,7 @@ export class StudentDashboard extends Component {
     pdfFile: null,
     peer: null,
     transcripts: "", // r-trans -> append the text to this
-    partial: "" //r-partial-> update this to the text, r-trans -> ""
+    partial: "", //r-partial-> update this to the text, r-trans -> ""
   };
 
   componentDidMount = () => {
@@ -34,25 +33,25 @@ export class StudentDashboard extends Component {
     var peer = new Peer(null, {
       host: "localhost",
       port: 9000,
-      path: "/myapp"
+      path: "/myapp",
     });
     //Initialising the socket and setting the state to be used anywhere
     const socket = io(`http://localhost:8081`);
     this.setState({ socket, socketSet: true }, () => {
-      this.state.socket.on("r-partial", partial => {
+      this.state.socket.on("r-partial", (partial) => {
         this.setState({
-          partial: partial
+          partial: partial,
         });
       });
 
-      this.state.socket.on("r-trans", trans => {
+      this.state.socket.on("r-trans", (trans) => {
         this.setState({
           transcripts: (this.state.transcripts + " " + trans).trim(),
-          partial: ""
+          partial: "",
         });
       });
 
-      this.state.socket.on("r-link", pdfFile => {
+      this.state.socket.on("r-link", (pdfFile) => {
         this.setState({ pdfFile });
       });
     });
@@ -60,7 +59,7 @@ export class StudentDashboard extends Component {
     console.log("peer initialized");
     navigator.mediaDevices
       .getUserMedia({ video: true })
-      .then(stream => {
+      .then((stream) => {
         //IMPORTANT: DO NOT SET ANY STATE BEFORE THIS
         this.setState({ socketSet: false });
         //Setting student's stream
@@ -72,14 +71,14 @@ export class StudentDashboard extends Component {
             this.props.StudentState.courseId,
             this.state.myStream
           );
-          call.on("stream", remoteStream => {
+          call.on("stream", (remoteStream) => {
             //Setting remoteStream i.e teacher's stream
             console.log("Teacher stream reached");
             this.setState({ remoteStream });
           });
         });
       })
-      .catch(err => {
+      .catch((err) => {
         //TODO:Error component
         console.log("Error while streaming student's stream.", err);
       });
@@ -94,7 +93,7 @@ export class StudentDashboard extends Component {
       // Set incoming stream to null
       this.setState({ remoteStream: null });
       // Start listening for incoming images
-      this.state.socket.on("r-image", img => {
+      this.state.socket.on("r-image", (img) => {
         let imgNew = new Blob([img]);
         this.setState({ imgSrc: URL.createObjectURL(imgNew) });
       });
@@ -102,31 +101,31 @@ export class StudentDashboard extends Component {
     if (this.state.socketSet) {
       this.state.socket.emit("join-room", {
         room: this.props.StudentState.courseId,
-        username: this.props.StudentState.name
+        username: this.props.StudentState.name,
       });
       // listen for quiz start
-      this.state.socket.on("r-quiz", quiz => {
+      this.state.socket.on("r-quiz", (quiz) => {
         this.setState({
           showQuiz: true,
           quiz: quiz.quiz,
-          quizTitle: quiz.title
+          quizTitle: quiz.title,
         });
       });
-      this.state.socket.on("r-test", data => {
+      this.state.socket.on("r-test", (data) => {
         console.log("Testing socket ", data);
       });
       console.log("Student joined the room.");
       console.log("Student listening.");
     }
   };
-  submitMarks = marks => {
+  submitMarks = (marks) => {
     // send quiz marks
     this.state.socket.emit("r-quiz-submit", {
       name: this.props.StudentState.name,
-      marks
+      marks,
     });
     // revert to normal stream
-    this.setState({ marks, showQuiz: false });
+    this.setState({ showQuiz: false });
   };
 
   showImage = () => {
