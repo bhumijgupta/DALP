@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "DALP-backend",
   "version": "1.0.0",
   "description": "This is the backend for the DALP project.",
   "main": "server.js",
@@ -18,7 +18,7 @@
     "webRTC"
   ],
   "author": "YashMeh",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/bhumijgupta/DALP/issues"
   },

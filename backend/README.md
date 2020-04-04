@@ -1,4 +1,5 @@
-# DALP backend 
+# DALP backend
+
 ## Installation
 
 `npm install`
@@ -12,6 +13,7 @@
 `{"dbURI":"YOUR DATABASE URI"}`
 
 ## Running the peer.js server
+
 ```cmd
 npm install -g peer
 peerjs --port 9000 --key peerjs --path /myapp
@@ -25,7 +27,8 @@ peerjs --port 9000 --key peerjs --path /myapp
 
 `npm run socket`
 
+**Note**: All the three servers are required for proper functioning of the website
+
 ## Testing
 
 `npm test`
-
