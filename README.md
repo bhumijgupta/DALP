@@ -41,8 +41,7 @@ cd backend
 npm install
 npm install -g peer
 peerjs --port 9000 --key peerjs --path /myapp
-npm run start
-npm run socket
+npm start
 ```
 
 3. Start the front end server

@@ -35,7 +35,7 @@ export class TeacherDashboard extends Component {
         path: "/myapp",
       });
       //Initialising the socket and setting the state to be used anywhere
-      const socket = io(`http://localhost:8081`);
+      const socket = io(`http://localhost:8080`);
       this.setState({ socket, socketSet: true });
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
@@ -323,7 +323,7 @@ export class TeacherDashboard extends Component {
   };
 
   quizContainer = () => {
-    if (this.props.TeacherState.quiz.length === 0) {
+    if (this.props.TeacherState.quiz === null) {
       return <h5 className="card-title">No quiz configured</h5>;
     }
     return (

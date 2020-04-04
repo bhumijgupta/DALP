@@ -37,7 +37,7 @@ export class StudentDashboard extends Component {
       path: "/myapp",
     });
     //Initialising the socket and setting the state to be used anywhere
-    const socket = io(`http://localhost:8081`);
+    const socket = io(`http://localhost:8080`);
     this.setState({ socket, socketSet: true }, () => {
       this.state.socket.on("r-partial", (partial) => {
         this.setState({

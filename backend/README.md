@@ -19,15 +19,9 @@ npm install -g peer
 peerjs --port 9000 --key peerjs --path /myapp
 ```
 
-## Running the main server
+## Running the backend server
 
 `npm start`
-
-## Running the socket server
-
-`npm run socket`
-
-**Note**: All the three servers are required for proper functioning of the website
 
 ## Testing
 
