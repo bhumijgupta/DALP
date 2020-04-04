@@ -26,6 +26,7 @@ export class StudentDashboard extends Component {
     peer: null,
     transcripts: "", // r-trans -> append the text to this
     partial: "", //r-partial-> update this to the text, r-trans -> ""
+    teacherLeft: false,
   };
 
   componentDidMount = () => {
@@ -53,6 +54,11 @@ export class StudentDashboard extends Component {
 
       this.state.socket.on("r-link", (pdfFile) => {
         this.setState({ pdfFile });
+      });
+
+      this.state.socket.on("t-left", () => {
+        this.cleanup();
+        this.setState({ teacherLeft: true });
       });
     });
     console.log("socket init");
@@ -84,7 +90,7 @@ export class StudentDashboard extends Component {
       });
     //socket.emit("s-test", "Hello I am student");
   };
-  // TODO: Show loading is not streaming
+
   componentDidUpdate = (prevProps, prevState) => {
     if (
       this.state.slowConnection === true &&
@@ -144,6 +150,30 @@ export class StudentDashboard extends Component {
         </>
       );
   };
+
+  // Cleanup resources
+  cleanup = async () => {
+    if (this.state.myStream) {
+      let tracks = await this.state.myStream.getTracks();
+      tracks.forEach((track) => {
+        track.stop();
+      });
+    }
+    if (this.state.peer) {
+      this.state.peer.destroy();
+    }
+    if (this.state.socket) {
+      this.state.socket.close();
+    }
+    this.setState({
+      myStream: null,
+      showQuiz: false,
+      socket: null,
+      remoteStream: null,
+      peer: null,
+    });
+  };
+
   showStream = () => {
     return (
       <>
@@ -163,10 +193,25 @@ export class StudentDashboard extends Component {
     );
   };
 
+  showAlert = () => {
+    if (!this.state.teacherLeft) return null;
+    return (
+      <div className="row">
+        <div className="col-md">
+          <div className="alert alert-primary" role="alert">
+            Teacher left the class! Thank you for attending the course.
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   render() {
+    // If user not authenticated
     if (!this.props.StudentAuth) {
       return <Redirect to="/student" />;
     }
+    // If showQuiz
     if (this.state.showQuiz) {
       return (
         <QuizView
@@ -176,6 +221,7 @@ export class StudentDashboard extends Component {
         />
       );
     }
+    // else
     return (
       <div className="student-dashboard mb-3">
         <NavBar
@@ -183,6 +229,7 @@ export class StudentDashboard extends Component {
           dashboardTitle={"Student Dashboard"}
         />
         <div className="container content">
+          {this.showAlert()}
           <div className="row">
             <div className="col-md">
               {this.state.slowConnection ? this.showImage() : this.showStream()}

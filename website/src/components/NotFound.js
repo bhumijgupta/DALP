@@ -5,6 +5,7 @@ import WhiteBtnOutline from "./WhiteBtnOutline";
 import GradientContainer from "./GradientContainer";
 import BrandHeader from "./BrandHeader";
 
+// TODO: Add vector and center this
 function NotFound() {
   return (
     <GradientContainer>
