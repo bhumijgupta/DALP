@@ -1,0 +1,8 @@
+- ipad mdm mode
+- known users
+- beautiful and works on ipad
+- teacher administration
+- analysis of image
+-- selfie image of students every second
+- not native application(progressive web-apps preferably)
+- done what we have done on an ipad
