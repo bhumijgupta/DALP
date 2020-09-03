@@ -53,6 +53,22 @@ npm run start
 
 4. Go to [http://localhost:3000](http://localhost:3000) for the kick of awesomeness
 
+## Run using docker
+
+- Start the containers
+
+```cmd
+docker-compose up
+```
+
+Go to [http://localhost:3000](http://localhost:3000)
+
+- Stop the containers
+
+```cmd
+docker-compose down
+```
+
 ## Developed by
 
 This platform is proudly made by team `unpaid_interns`

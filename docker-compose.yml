@@ -2,10 +2,8 @@ version: "3"
 services:
   frontend:
     image: yashmeh/dalp-frontend:0.0.1
-    expose:
-      - "3000"
     ports:
-      - "3000:3000"
+      - "3000:80"
     environment:
       - API_URL=http://api:8080
       - PEER_URL=http://peer:9000/myapp
@@ -14,7 +12,6 @@ services:
     depends_on:
       - api
       - peer
-    command: npm start
   api:
     image: yashmeh/dalp-api:0.0.1
     expose:
