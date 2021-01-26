@@ -29,13 +29,19 @@ export class TeacherDashboard extends Component {
     if (this.props.TeacherAuth) {
       this.canvas = React.createRef();
       //Initialising the peer
-      const peer = new Peer(this.props.TeacherState.courseId, {
-        host: "localhost",
+      const HOST = process.env.PEER_URL === undefined ? "localhost" : "peer";
+      console.log(process.env.PEER_URL);
+      var peer = new Peer(null, {
+        host: `${HOST}`,
         port: 9000,
         path: "/myapp",
       });
       //Initialising the socket and setting the state to be used anywhere
-      const socket = io(`http://localhost:8080`);
+      const Api_URL =
+        process.env.API_URL === undefined
+          ? "http://localhost:8080"
+          : process.env.API_URL;
+      const socket = io(Api_URL);
       this.setState({ socket, socketSet: true });
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })

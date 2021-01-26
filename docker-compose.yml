@@ -1,0 +1,49 @@
+version: "3"
+services:
+  frontend:
+    image: yashmeh/dalp-frontend:0.0.1
+    ports:
+      - "3000:80"
+    environment:
+      - API_URL=http://api:8080
+      - PEER_URL=http://peer:9000/myapp
+    networks:
+      - backend
+    depends_on:
+      - api
+      - peer
+  api:
+    image: yashmeh/dalp-api:0.0.1
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    environment:
+      - dbURI=mongodb://mongodalp:27017/dalp
+    networks:
+      - backend
+    depends_on:
+      - mongo
+    command: npm run start
+  mongo:
+    container_name: mongodalp
+    image: mongo
+    networks:
+      - backend
+    volumes:
+      - db-data:/data/db
+    ports:
+      - "27017:27017"
+  peer:
+    image: yashmeh/dalp-peer:0.0.1
+    expose:
+      - "9000"
+    ports:
+      - "9000:9000"
+    networks:
+      - backend
+    command: peerjs --port 9000 --key peerjs --path /myapp
+networks:
+  backend:
+volumes:
+  db-data:

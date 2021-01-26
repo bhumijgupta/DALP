@@ -1,7 +1,10 @@
 import axios from "axios";
-
+const baseURL =
+  process.env.API_URL === undefined
+    ? "http://localhost:8080"
+    : process.env.API_URL;
 let api = axios.create({
-  baseURL: "http://localhost:8080/api/course"
+  baseURL: `${baseURL}/api/course`,
 });
 
 export default api;

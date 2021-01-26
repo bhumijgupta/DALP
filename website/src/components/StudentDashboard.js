@@ -31,13 +31,18 @@ export class StudentDashboard extends Component {
 
   componentDidMount = () => {
     //Initiating a peer
+    const HOST = process.env.PEER_URL === undefined ? "localhost" : "peer";
     var peer = new Peer(null, {
-      host: "localhost",
+      host: `${HOST}`,
       port: 9000,
       path: "/myapp",
     });
     //Initialising the socket and setting the state to be used anywhere
-    const socket = io(`http://localhost:8080`);
+    const Api_URL =
+      process.env.API_URL === undefined
+        ? "http://localhost:8080"
+        : process.env.API_URL;
+    const socket = io(Api_URL);
     this.setState({ socket, socketSet: true }, () => {
       this.state.socket.on("r-partial", (partial) => {
         this.setState({

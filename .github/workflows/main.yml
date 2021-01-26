@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Docker Login
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and tag frontend image
+        working-directory: ./website
+        run: docker build -f Dockerfile.prod -t yashmeh/dalp-frontend:0.0.1 .
+
+      - name: Build and tag api image
+        working-directory: ./backend
+        run: docker build -t yashmeh/dalp-api:0.0.1 .
+
+      - name: Build and tag peer image
+        working-directory: ./backend/peerDocker
+        run: docker build -t yashmeh/dalp-peer:0.0.1 .
+
+      - name: Push the frontend image to docker hub
+        run: docker push yashmeh/dalp-frontend:0.0.1
+
+      - name: Push the api image to docker hub
+        run: docker push yashmeh/dalp-api:0.0.1
+
+      - name: Push the peer image to docker hub
+        run: docker push yashmeh/dalp-peer:0.0.1
